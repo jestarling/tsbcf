@@ -2,7 +2,7 @@
 % Please edit documentation in R/KStest.R
 \name{tuneEcrossCausal}
 \alias{tuneEcrossCausal}
-\title{tuneEcrossCausal: Utility function for tuning expected number of crossings for tsbart().}
+\title{tuneEcrossCausal: Utility function for tuning expected number of crossings for tsbcf().}
 \usage{
 tuneEcrossCausal(ecross_candidates =
                            cbind.data.frame(
