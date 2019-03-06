@@ -173,66 +173,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// tsbartFit
-List tsbartFit(arma::vec y, arma::vec tgt, arma::vec tpred, arma::vec x, arma::vec xpred, List xinfo_list, int nburn, int nsim, int ntree, double lambda, double sigq, double sighat, double nu, double ecross, double base_tree, double power_tree, double con_sd, bool use_fscale, CharacterVector treef_name_, bool save_trees, bool silent_mode);
-RcppExport SEXP _tsbcf_tsbartFit(SEXP ySEXP, SEXP tgtSEXP, SEXP tpredSEXP, SEXP xSEXP, SEXP xpredSEXP, SEXP xinfo_listSEXP, SEXP nburnSEXP, SEXP nsimSEXP, SEXP ntreeSEXP, SEXP lambdaSEXP, SEXP sigqSEXP, SEXP sighatSEXP, SEXP nuSEXP, SEXP ecrossSEXP, SEXP base_treeSEXP, SEXP power_treeSEXP, SEXP con_sdSEXP, SEXP use_fscaleSEXP, SEXP treef_name_SEXP, SEXP save_treesSEXP, SEXP silent_modeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type tgt(tgtSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type tpred(tpredSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type xpred(xpredSEXP);
-    Rcpp::traits::input_parameter< List >::type xinfo_list(xinfo_listSEXP);
-    Rcpp::traits::input_parameter< int >::type nburn(nburnSEXP);
-    Rcpp::traits::input_parameter< int >::type nsim(nsimSEXP);
-    Rcpp::traits::input_parameter< int >::type ntree(ntreeSEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< double >::type sigq(sigqSEXP);
-    Rcpp::traits::input_parameter< double >::type sighat(sighatSEXP);
-    Rcpp::traits::input_parameter< double >::type nu(nuSEXP);
-    Rcpp::traits::input_parameter< double >::type ecross(ecrossSEXP);
-    Rcpp::traits::input_parameter< double >::type base_tree(base_treeSEXP);
-    Rcpp::traits::input_parameter< double >::type power_tree(power_treeSEXP);
-    Rcpp::traits::input_parameter< double >::type con_sd(con_sdSEXP);
-    Rcpp::traits::input_parameter< bool >::type use_fscale(use_fscaleSEXP);
-    Rcpp::traits::input_parameter< CharacterVector >::type treef_name_(treef_name_SEXP);
-    Rcpp::traits::input_parameter< bool >::type save_trees(save_treesSEXP);
-    Rcpp::traits::input_parameter< bool >::type silent_mode(silent_modeSEXP);
-    rcpp_result_gen = Rcpp::wrap(tsbartFit(y, tgt, tpred, x, xpred, xinfo_list, nburn, nsim, ntree, lambda, sigq, sighat, nu, ecross, base_tree, power_tree, con_sd, use_fscale, treef_name_, save_trees, silent_mode));
-    return rcpp_result_gen;
-END_RCPP
-}
-// tsbartProbit
-List tsbartProbit(arma::vec y, arma::vec yobs, arma::vec tgt, arma::vec tpred, arma::vec x, arma::vec xpred, List xinfo_list, int nburn, int nsim, double offset, int ntree, double ecross, double base_tree, double power_tree, double con_sd, bool use_fscale, CharacterVector treef_name_, bool save_trees, bool silent_mode);
-RcppExport SEXP _tsbcf_tsbartProbit(SEXP ySEXP, SEXP yobsSEXP, SEXP tgtSEXP, SEXP tpredSEXP, SEXP xSEXP, SEXP xpredSEXP, SEXP xinfo_listSEXP, SEXP nburnSEXP, SEXP nsimSEXP, SEXP offsetSEXP, SEXP ntreeSEXP, SEXP ecrossSEXP, SEXP base_treeSEXP, SEXP power_treeSEXP, SEXP con_sdSEXP, SEXP use_fscaleSEXP, SEXP treef_name_SEXP, SEXP save_treesSEXP, SEXP silent_modeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type yobs(yobsSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type tgt(tgtSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type tpred(tpredSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type xpred(xpredSEXP);
-    Rcpp::traits::input_parameter< List >::type xinfo_list(xinfo_listSEXP);
-    Rcpp::traits::input_parameter< int >::type nburn(nburnSEXP);
-    Rcpp::traits::input_parameter< int >::type nsim(nsimSEXP);
-    Rcpp::traits::input_parameter< double >::type offset(offsetSEXP);
-    Rcpp::traits::input_parameter< int >::type ntree(ntreeSEXP);
-    Rcpp::traits::input_parameter< double >::type ecross(ecrossSEXP);
-    Rcpp::traits::input_parameter< double >::type base_tree(base_treeSEXP);
-    Rcpp::traits::input_parameter< double >::type power_tree(power_treeSEXP);
-    Rcpp::traits::input_parameter< double >::type con_sd(con_sdSEXP);
-    Rcpp::traits::input_parameter< bool >::type use_fscale(use_fscaleSEXP);
-    Rcpp::traits::input_parameter< CharacterVector >::type treef_name_(treef_name_SEXP);
-    Rcpp::traits::input_parameter< bool >::type save_trees(save_treesSEXP);
-    Rcpp::traits::input_parameter< bool >::type silent_mode(silent_modeSEXP);
-    rcpp_result_gen = Rcpp::wrap(tsbartProbit(y, yobs, tgt, tpred, x, xpred, xinfo_list, nburn, nsim, offset, ntree, ecross, base_tree, power_tree, con_sd, use_fscale, treef_name_, save_trees, silent_mode));
-    return rcpp_result_gen;
-END_RCPP
-}
 // tsbcfFit
 List tsbcfFit(arma::vec y, arma::vec z, arma::vec zpred, arma::vec tgt, arma::vec tpred, arma::vec x_con, arma::vec x_mod, arma::vec xpred_con, arma::vec xpred_mod, List xinfo_list_con, List xinfo_list_mod, arma::vec trt_init, int nburn, int nsim, int ntree_con, int ntree_mod, double lambda, double sigq, double sighat, double nu, double base_con, double power_con, double base_mod, double power_mod, double ecross_con, double ecross_mod, double con_sd, double mod_sd, bool use_muscale, bool use_tauscale, CharacterVector treef_name_, bool save_trees, bool silent_mode);
 RcppExport SEXP _tsbcf_tsbcfFit(SEXP ySEXP, SEXP zSEXP, SEXP zpredSEXP, SEXP tgtSEXP, SEXP tpredSEXP, SEXP x_conSEXP, SEXP x_modSEXP, SEXP xpred_conSEXP, SEXP xpred_modSEXP, SEXP xinfo_list_conSEXP, SEXP xinfo_list_modSEXP, SEXP trt_initSEXP, SEXP nburnSEXP, SEXP nsimSEXP, SEXP ntree_conSEXP, SEXP ntree_modSEXP, SEXP lambdaSEXP, SEXP sigqSEXP, SEXP sighatSEXP, SEXP nuSEXP, SEXP base_conSEXP, SEXP power_conSEXP, SEXP base_modSEXP, SEXP power_modSEXP, SEXP ecross_conSEXP, SEXP ecross_modSEXP, SEXP con_sdSEXP, SEXP mod_sdSEXP, SEXP use_muscaleSEXP, SEXP use_tauscaleSEXP, SEXP treef_name_SEXP, SEXP save_treesSEXP, SEXP silent_modeSEXP) {
@@ -336,8 +276,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_tsbcf_dmixnorm_post", (DL_FUNC) &_tsbcf_dmixnorm_post, 4},
     {"_tsbcf_pmixnorm_post", (DL_FUNC) &_tsbcf_pmixnorm_post, 4},
     {"_tsbcf_rpgmix", (DL_FUNC) &_tsbcf_rpgmix, 3},
-    {"_tsbcf_tsbartFit", (DL_FUNC) &_tsbcf_tsbartFit, 21},
-    {"_tsbcf_tsbartProbit", (DL_FUNC) &_tsbcf_tsbartProbit, 19},
     {"_tsbcf_tsbcfFit", (DL_FUNC) &_tsbcf_tsbcfFit, 33},
     {"_tsbcf_tsbcfProbit", (DL_FUNC) &_tsbcf_tsbcfProbit, 34},
     {"_rcpp_module_boot_treesample_module", (DL_FUNC) &_rcpp_module_boot_treesample_module, 0},

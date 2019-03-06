@@ -9,8 +9,8 @@ Maintainer: Questions and comments to <jstarling@utexas.edu>
 BugReports: https://github.com/jestarling/tsbcf/issues
 Description: Implements Targeted Smooth Bayesian Causal Forests (tsbcf)
 License: GNU GPL v3.0
-Depends: Rcpp (>= 0.10.4), RcppArmadillo, tsbart
-LinkingTo: Rcpp, RcppArmadillo
+Depends: Rcpp (>= 0.10.4), RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo, tsbart
 NeedsCompilation: yes
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
