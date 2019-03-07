@@ -146,9 +146,9 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
       #-----------------------------------------------------------------------
       out$ate_t_hat = cbind.data.frame('tgt'=rep(tgrid, each=ng),
                                   'subgroup'=rep(grps, times=nt),
-                                  'ate'=apply(out$cate_t_post,2,mean),
-                                  'lb'=apply(out$cate_t_post,2,function(x) quantile(x,.025)),
-                                  'ub'=apply(out$cate_t_post,2,function(x) quantile(x,.975)))
+                                  'ate'=apply(out$ate_t_post,2,mean),
+                                  'lb'=apply(out$ate_t_post,2,function(x) quantile(x,.025)),
+                                  'ub'=apply(out$ate_t_post,2,function(x) quantile(x,.975)))
 
    }
 
