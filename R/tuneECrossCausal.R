@@ -1,6 +1,6 @@
 tuneEcrossCausal = function(ecross_candidates = cbind.data.frame(
-                                                   'ecross_control'=rep(c(.5,1,2.5,5),each=4),
-                                                   'ecross_moderate'=rep(c(.5,1,2.5,5),times=4)),
+                                                   'ecross_control'=rep(c(1,2.5),each=3),
+                                                   'ecross_moderate'=rep(c(1,2.5,5),times=2)),
                     y, pihat, z, tgt, x_control, x_moderate,
                     pihatpred=0, zpred=0, tpred=0, xpred_control=matrix(0,0,0), xpred_moderate=matrix(0,0,0),
                     nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,

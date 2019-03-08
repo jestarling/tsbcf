@@ -213,16 +213,16 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    # Set up ecross_candidates dataframe for tuning.
    if(ecross_control=="tune" & ecross_moderate=="tune"){
       ecross_candidates = cbind.data.frame(
-         'ecross_control'=rep(c(.5,1,2.5,5),each=4),
-         'ecross_moderate'=rep(c(.5,1,2.5,5),times=4))
+         'ecross_control'=rep(c(1,2.5,5),each=3),
+         'ecross_moderate'=rep(c(1,2.5,5),times=3))
    } else if(ecross_control=="tune" & ecross_moderate!="tune"){
       ecross_candidates = cbind.data.frame(
-         'ecross_control'=rep(c(.5,1,2.5,5),each=1),
-         'ecross_moderate'=rep(ecross_moderate,times=4))
+         'ecross_control'=rep(c(1,2.5,5),each=1),
+         'ecross_moderate'=rep(ecross_moderate,times=3))
    } else{
       ecross_candidates = cbind.data.frame(
-         'ecross_control'=rep(ecross_control,times=4),
-         'ecross_moderate'=rep(c(.5,1,2.5,5),each=1))
+         'ecross_control'=rep(ecross_control,times=3),
+         'ecross_moderate'=rep(c(1,2.5,5),each=1))
    }
 
    # Control tuning.
