@@ -46,7 +46,10 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
 
    # Set up grids of times and groups.
    tgrid = sort(unique(tsbcf_output$tgt))
-   grps = ifelse(is.null(subgroups),NA,sort(unique(subgroups)))
+   grps = NA
+   if(!is.null(subgroups)){
+      grps = sort(unique(subgroups))
+   }
 
    # Number of times and groups.
    nt = length(tgrid)
