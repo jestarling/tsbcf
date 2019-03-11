@@ -220,20 +220,26 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    # Parameter tuning if necessary.
    ################################################################
 
-   # Set up ecross_candidates for tuning.
-   if(ecross_control=="tune" & is.null(ecross_control_candidates)){
-      ecross_control_candidates = c(1,2.5,5)
-   }
-   if(ecross_control!="tune"){
-      ecross_control_candidates = ecross_control
-   }
+   print(ecross_control_candidates)
+   print(ecross_moderate_candidates)
 
-   if(ecross_moderate=="tune" & is.null(ecross_moderate_candidates)){
-      ecross_moderate_candidates = c(1,2.5,5,7.5,10)
-   }
-   if(ecross_moderate!="tune"){
-      ecross_moderate_candidates = ecross_moderate
-   }
+   # Set up ecross_candidates for tuning.
+   # if(ecross_control=="tune" & is.null(ecross_control_candidates)){
+   #    ecross_control_candidates = c(1,2.5,5)
+   # }
+   # if(ecross_control!="tune"){
+   #    ecross_control_candidates = ecross_control
+   # }
+   #
+   # if(ecross_moderate=="tune" & is.null(ecross_moderate_candidates)){
+   #    ecross_moderate_candidates = c(1,2.5,5,7.5,10)
+   # }
+   # if(ecross_moderate!="tune"){
+   #    ecross_moderate_candidates = ecross_moderate
+   # }
+   #
+   # print(ecross_control_candidates)
+   # print(ecross_moderate_candidates)
 
    # Perform tuning.
    if(ecross_control=="tune" || ecross_moderate=="tune"){
