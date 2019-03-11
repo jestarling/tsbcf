@@ -11,7 +11,9 @@ tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   sd_control=2*sd(y), sd_moderate=sd(y),
                   treatment_init = rep(1,length(unique(tgt))),
                   use_muscale=T, use_tauscale=T,
-                  ecross_control=1, ecross_moderate=1, pihat_in_trt=T,
+                  ecross_control=1, ecross_moderate=1,
+                  ecross_control_candidates = NULL, ecross_moderate_candidates = NULL,
+                  pihat_in_trt=T,
                   probit=FALSE, yobs=NULL, verbose=T, mh=F, save_inputs=T)
 }
 \arguments{
@@ -74,6 +76,10 @@ tsbcf(y, pihat, z, tgt, x_control, x_moderate,
 \item{ecross_control}{Smoothing parameter for prognostic tree fit; number of expected times f(x,t) crosses the mean response over time, alpha(t). Defaults to 1.  Can set to "tune" to perform parameter tuning.}
 
 \item{ecross_moderate}{Smoothing parameter for treatment tree fit; number of expected times f(x,t) crosses the mean response over time, alpha(t). Defaults to 1.  Can set to "tune" to perform parameter tuning.}
+
+\item{ecross_control_candidates}{Vector of candidate values for ecross_control.  Defaults to NULL; is only considered if ecross_control="tune", otherwise is ignored.}
+
+\item{ecross_moderate_candidates}{Vector of candidate values for ecross_moderate.  Defaults to NULL; is only considered if ecross_moderate="tune", otherwise is ignored.}
 
 \item{pihat_in_trt}{Boolean, ndicates whether to include the estimated propensity score as a covariate for the treatment tree fit.  (Is always included in prognostic tree fit.)  Defaults to TRUE.}
 

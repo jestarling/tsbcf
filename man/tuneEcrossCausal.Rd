@@ -4,26 +4,26 @@
 \alias{tuneEcrossCausal}
 \title{tuneEcrossCausal: Utility function for tuning expected number of crossings for tsbcf().}
 \usage{
-tuneEcrossCausal(ecross_candidates =
-                           cbind.data.frame(
-                                  'ecross_control'=rep(c(.5,1,2.5,5),each=4),
-                                  'ecross_moderate'=rep(c(.5,1,2.5,5),times=4)),
-                    y, pihat, z, tgt, x_control, x_moderate,
-                    pihatpred=0, zpred=0, tpred=0,
-                    xpred_control=matrix(0,0,0), xpred_moderate=matrix(0,0,0),
-                    nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
-                    lambda=NULL, sigq=.9, sighat=NULL, nu=3,
-                    base_control=.95, power_control=2,
-                    base_moderate=.25, power_moderate=3,
-                    sd_control=2*sd(y), sd_moderate=sd(y),
-                    treatment_init = rep(1,length(unique(tgt))),
-                    use_muscale=T, use_tauscale=T,
-                    pihat_in_trt=F,
-                    probit=FALSE, yobs=NULL)
+tuneEcrossCausal(ecross_control_candidates = c(1,2.5,5),
+                 ecross_moderate_candidates = c(1,2.5,5,7.5,10),
+                 y, pihat, z, tgt, x_control, x_moderate,
+                 pihatpred=0, zpred=0, tpred=0,
+                 xpred_control=matrix(0,0,0), xpred_moderate=matrix(0,0,0),
+                 nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
+                 lambda=NULL, sigq=.9, sighat=NULL, nu=3,
+                 base_control=.95, power_control=2,
+                 base_moderate=.25, power_moderate=3,
+                 sd_control=2*sd(y), sd_moderate=sd(y),
+                 treatment_init = rep(1,length(unique(tgt))),
+                 use_muscale=T, use_tauscale=T,
+                 pihat_in_trt=F,
+                 probit=FALSE, yobs=NULL)
 }
 \arguments{
 
-\item{ecross_candidates}{Dataframe where each row is a candidate pair of (ecross_control, ecross_moderate) values.  Default is cbind.data.frame('ecross_control'=rep(c(.5,1,2.5,5),each=4), 'ecross_moderate'=rep(c(.5,1,2.5,5),times=4)).}
+\item{ecross_control_candidates}{Vector where each element is a candidate ecross_control value for tuning.  All combinations of ecross_control_candidates and ecross_moderate_candidates are considered.}
+
+\item{ecross_moderate_candidates}{Vector where each element is a candidate ecross_moderate value for tuning.  All combinations of ecross_control_candidates and ecross_moderate_candidates are considered.}
 
 \item{y}{Length n vector with continuous response values.  In probit case, should contain initializations for latent variables (+/- 1.96, for example).}
 
@@ -91,7 +91,9 @@ tuneEcrossCausal(ecross_candidates =
 \value{
 A list object, containing the following items:
 
-\item{ecross_opt}{A data frame with one row, and two columns.  Contains the optimal pair of ecross_control (col 1) and ecross_moderate (col 2) values selected.}
+\item{ecross_control}{The ecross_control value from the optimal {ecross_control, ecross_moderate} pair.}
+
+\item{ecross_moderate}{The ecross_moderate value from the optimal {ecross_control, ecross_moderate} pair.}
 
 \item{waic_plot}{A ggplot object containing diagnostics for tuning expected crossings.}
 
@@ -104,10 +106,8 @@ This function provides tunes the expected number of crossings.  See vignette for
 \examples{
 \dontrun{
 ## Evaluate optimal number of crossings.
-ecrossTune = tuneEcrossCausal(ecross_candidates =
-                           cbind.data.frame(
-                                  'ecross_control'=rep(c(.5,1,2.5,5),each=4),
-                                  'ecross_moderate'=rep(c(.5,1,2.5,5),times=4)),
+ecrossTune = tuneEcrossCausal(ecross_control_candidates = c(1,2.5,5),
+                    ecross_moderate_candidates = c(1,2.5,5,7.5,10),
                     y, pihat, z, tgt, x_control, x_moderate,
                     pihatpred=0, zpred=0, tpred=0,
                     xpred_control=matrix(0,0,0), xpred_moderate=matrix(0,0,0),

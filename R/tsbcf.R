@@ -23,7 +23,10 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                   sd_control=2*sd(y), sd_moderate=sd(y),
                   treatment_init = rep(1,length(unique(tgt))),
                   use_muscale=T, use_tauscale=T,
-                  ecross_control=1, ecross_moderate=1, pihat_in_trt=F,
+                  ecross_control=1, ecross_moderate=1,
+                  ecross_control_candidates = NULL,
+                  ecross_moderate_candidates = NULL,
+                  pihat_in_trt=F,
                   probit=FALSE, yobs=NULL, verbose=T, mh=F, save_inputs=T){
 
    ################################################################
@@ -145,6 +148,13 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    if(ecross_moderate<=0) stop("ecross_moderate must be positive")
    if(class(ecross_moderate)=="character" & ecross_moderate!="tune") stop("ecross_moderate must be a positive value or set to 'tune'.")
 
+   # For tuning parameter inputs.
+   if(ecross_control!="tune" & !is.null(ecross_control_candidates)) warning("ecross_control_candidates will be ignored; ecross_control value has been provided.")
+   if(ecross_moderate!="tune" & !is.null(ecross_moderate_candidates)) warning("ecross_moderate_candidates will be ignored; ecross_moderate value has been provided.")
+
+   if(ecross_control=="tune" & is.null(ecross_control_candidates)) warning("Default ecross_control_candidates will be used: {1, 2.5, 5}")
+   if(ecross_moderate=="tune" & is.null(ecross_moderate_candidates)) warning("Default ecross_moderate_candidates will be used: {1, 2.5, 5, 7.5, 10}")
+
    ################################################################
    # Scale/center response y. (For non-probit case.)
    ################################################################
@@ -212,34 +222,31 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
 
    # Set up ecross_candidates dataframe for tuning.
    if(ecross_control=="tune" & ecross_moderate=="tune"){
-      ecross_candidates = cbind.data.frame(
-         'ecross_control'=rep(c(1,2.5,5),each=3),
-         'ecross_moderate'=rep(c(1,2.5,5),times=3))
+      ecross_control_candidates = c(1,2.5,5)
+      ecross_moderate_candidates = c(1,2.5,5,7.5,10)
    } else if(ecross_control=="tune" & ecross_moderate!="tune"){
-      ecross_candidates = cbind.data.frame(
-         'ecross_control'=rep(c(1,2.5,5),each=1),
-         'ecross_moderate'=rep(ecross_moderate,times=3))
+      ecross_control_candidates = c(1,2.5,5)
+      ecross_moderate_candidates = ecross_moderate
    } else{
-      ecross_candidates = cbind.data.frame(
-         'ecross_control'=rep(ecross_control,times=3),
-         'ecross_moderate'=rep(c(1,2.5,5),each=1))
+      ecross_control_candidates = ecross_control
+      ecross_moderate_candidates = c(1,2.5,5,7.5,10)
    }
 
    # Control tuning.
    if(ecross_control=="tune" || ecross_moderate=="tune"){
 
-      tuned = tuneEcrossCausal(ecross_candidates = ecross_candidates,
-         y, pihat, z, tgt, x_control, x_moderate,
-         pihatpred, zpred, tpred, xpred_control, xpred_moderate,
-         nburn=100, nsim=250, ntree_control, ntree_moderate,
-         lambda, sigq, sighat, nu,
-         base_control, power_control, base_moderate, power_moderate,
-         sd_control, sd_moderate, treatment_init,
-         use_muscale, use_tauscale, pihat_in_trt, probit, yobs)
+      tuned = tuneEcrossCausal(ecross_control_candidates=ecross_control_candidates,
+                               ecross_moderate_candidates=ecross_moderate_candidates,
+                               y, pihat, z, tgt, x_control, x_moderate,
+                               pihatpred, zpred, tpred, xpred_control, xpred_moderate,
+                               nburn=100, nsim=250, ntree_control, ntree_moderate,
+                               lambda, sigq, sighat, nu,
+                               base_control, power_control, base_moderate, power_moderate,
+                               sd_control, sd_moderate, treatment_init,
+                               use_muscale, use_tauscale, pihat_in_trt, probit, yobs)
 
-      ecross_opt = tuned$ecross_opt
-      ecross_control = as.numeric(ecross_opt[1])
-      ecross_moderate = as.numeric(ecross_opt[2])
+      ecross_control = as.numeric(tuned$ecross_control)
+      ecross_moderate = as.numeric(tuned$ecross_moderate)
    }
 
    ################################################################

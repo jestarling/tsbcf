@@ -1,17 +1,16 @@
-tuneEcrossCausal = function(ecross_candidates = cbind.data.frame(
-                                                   'ecross_control'=rep(c(1,2.5),each=3),
-                                                   'ecross_moderate'=rep(c(1,2.5,5),times=2)),
-                    y, pihat, z, tgt, x_control, x_moderate,
-                    pihatpred=0, zpred=0, tpred=0, xpred_control=matrix(0,0,0), xpred_moderate=matrix(0,0,0),
-                    nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
-                    lambda=NULL, sigq=.9, sighat=NULL, nu=3,
-                    base_control=.95, power_control=2,
-                    base_moderate=.25, power_moderate=3,
-                    sd_control=2*sd(y), sd_moderate=sd(y),
-                    treatment_init = rep(1,length(unique(tgt))),
-                    use_muscale=T, use_tauscale=T,
-                    pihat_in_trt=F,
-                    probit=FALSE, yobs=NULL){
+tuneEcrossCausal = function(ecross_control_candidates = c(1,2.5,5),
+                            ecross_moderate_candidates = c(1,2.5,5,7.5,10),
+                            y, pihat, z, tgt, x_control, x_moderate,
+                            pihatpred=0, zpred=0, tpred=0, xpred_control=matrix(0,0,0), xpred_moderate=matrix(0,0,0),
+                            nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
+                            lambda=NULL, sigq=.9, sighat=NULL, nu=3,
+                            base_control=.95, power_control=2,
+                            base_moderate=.25, power_moderate=3,
+                            sd_control=2*sd(y), sd_moderate=sd(y),
+                            treatment_init = rep(1,length(unique(tgt))),
+                            use_muscale=T, use_tauscale=T,
+                            pihat_in_trt=F,
+                            probit=FALSE, yobs=NULL){
 
    #---------------------------------------------------
    # FUNCTION: Optimizes expected number of crossings across specified grid.
@@ -62,7 +61,11 @@ tuneEcrossCausal = function(ecross_candidates = cbind.data.frame(
    }
 
    # Cubic spline fit.  If only tuning one variable, loess fit over that variable only.
-   ec = ecross_candidates
+   ec = cbind.data.frame(
+      'ecross_control' = rep(ecross_control_candidates, each=length(ecross_moderate_candidates)),
+      'ecross_moderate' = rep(ecross_moderate_candidates, times=length(ecross_control_candidates))
+   )
+
    n_candidates_con = length(unique(ec$ecross_control)) # number unique ec_con candidates.
    n_candidates_mod = length(unique(ec$ecross_moderate))# Number unique ec_mod candidates.
 
@@ -133,7 +136,8 @@ tuneEcrossCausal = function(ecross_candidates = cbind.data.frame(
 
 
 
-   return(list('ecross_opt' = exp_cross,
+   return(list('ecross_control'=exp_cross[1],
+               'ecross_moderate'=exp_cross[2],
                'waic_plot' = waicplt,
                'waic_grid' = cbind.data.frame('ec' = ecross_candidates, waic)))
 }
