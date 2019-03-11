@@ -20,10 +20,15 @@ tuneEcrossCausal = function(ecross_control_candidates = c(1,2.5,5),
    require(ggthemes)
 
    # Test that candidate list is long enough.
-   if(nrow(ecross_candidates)<3) stop('Try at least 3 candidate values for tuning.')
+   if(length(ecross_control_candidates)<3 & length(ecross_moderate_candidates)<3){
+      stop('Try at least 3 candidate values of at least one of the parameters for tuning.')
+   }
 
    # Ensure correct col names on candidate df.
-   colnames(ecross_candidates) = c('ecross_control','ecross_moderate')
+   ecross_candidates = cbind.data.frame(
+      'ecross_control' = rep(ecross_control_candidates, each=length(ecross_moderate_candidates)),
+      'ecross_moderate' = rep(ecross_moderate_candidates, times=length(ecross_control_candidates))
+   )
 
    # Calculate WAIC for each candidate ecross value.
    waic = rep(NA,nrow(ecross_candidates))
@@ -61,10 +66,7 @@ tuneEcrossCausal = function(ecross_control_candidates = c(1,2.5,5),
    }
 
    # Cubic spline fit.  If only tuning one variable, loess fit over that variable only.
-   ec = cbind.data.frame(
-      'ecross_control' = rep(ecross_control_candidates, each=length(ecross_moderate_candidates)),
-      'ecross_moderate' = rep(ecross_moderate_candidates, times=length(ecross_control_candidates))
-   )
+   ec = ecross_candidates
 
    n_candidates_con = length(unique(ec$ecross_control)) # number unique ec_con candidates.
    n_candidates_mod = length(unique(ec$ecross_moderate))# Number unique ec_mod candidates.
@@ -133,8 +135,6 @@ tuneEcrossCausal = function(ecross_control_candidates = c(1,2.5,5),
          geom_vline(aes(xintercept=exp_cross$ecross_moderate),colour='red',linetype=6) +
          scale_colour_colorblind(name='Ec_moderate')
    }
-
-
 
    return(list('ecross_control'=exp_cross[1],
                'ecross_moderate'=exp_cross[2],
