@@ -118,6 +118,7 @@ with unsmoothed covariates x_control for prognostic tree fit and x_moderate for 
                   <span class='kw'>use_muscale</span><span class='kw'>=</span><span class='no'>T</span>, <span class='kw'>use_tauscale</span><span class='kw'>=</span><span class='no'>T</span>,
                   <span class='kw'>ecross_control</span><span class='kw'>=</span><span class='fl'>1</span>, <span class='kw'>ecross_moderate</span><span class='kw'>=</span><span class='fl'>1</span>,
                   <span class='kw'>ecross_control_candidates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ecross_moderate_candidates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+                  <span class='kw'>ecross_tune_nburn</span><span class='kw'>=</span><span class='fl'>100</span>, <span class='kw'>ecross_tune_nsim</span><span class='kw'>=</span><span class='fl'>1000</span>,
                   <span class='kw'>pihat_in_trt</span><span class='kw'>=</span><span class='no'>T</span>,
                   <span class='kw'>probit</span><span class='kw'>=</span><span class='fl'>FALSE</span>, <span class='kw'>yobs</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>verbose</span><span class='kw'>=</span><span class='no'>T</span>, <span class='kw'>mh</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>save_inputs</span><span class='kw'>=</span><span class='no'>T</span>)</pre>
     
@@ -253,6 +254,14 @@ with unsmoothed covariates x_control for prognostic tree fit and x_moderate for 
       <td><p>Vector of candidate values for ecross_moderate.  Defaults to NULL; is only considered if ecross_moderate="tune", otherwise is ignored.</p></td>
     </tr>
     <tr>
+      <th>ecross_tune_nburn</th>
+      <td><p>Number of burn-in MCMC iterations for tuning the expected crossing parameters. Defaults to 100.</p></td>
+    </tr>
+    <tr>
+      <th>ecross_tune_nsim</th>
+      <td><p>Number of MCMC iterations for tuning the expected crossing parameters. Defaults to 1000.</p></td>
+    </tr>
+    <tr>
       <th>pihat_in_trt</th>
       <td><p>Boolean, ndicates whether to include the estimated propensity score as a covariate for the treatment tree fit.  (Is always included in prognostic tree fit.)  Defaults to TRUE.</p></td>
     </tr>
@@ -342,7 +351,10 @@ fit = tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   sd_control=2*sd(y), sd_moderate=sd(y),
                   treatment_init = rep(1,length(unique(tgt))),
                   use_muscale=T, use_tauscale=T,
-                  ecross=1, ecross_mod=1, pihat_in_trt=T,
+                  ecross=1, ecross_mod=1,
+                  ecross_control_candidates = NULL, ecross_moderate_candidates = NULL,
+                  ecross_tune_nburn=100, ecross_tune_nsim=1000,
+                  pihat_in_trt=T,
                   probit=FALSE, yobs=NULL, verbose=T, mh=F, save_inputs=T)
 # }
 </pre>

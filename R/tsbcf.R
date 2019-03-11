@@ -26,6 +26,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                   ecross_control=1, ecross_moderate=1,
                   ecross_control_candidates = NULL,
                   ecross_moderate_candidates = NULL,
+                  ecross_tune_nsim=100, ecross_tune_nburn=1000,
                   pihat_in_trt=F,
                   probit=FALSE, yobs=NULL, verbose=T, mh=F, save_inputs=T){
 
@@ -143,6 +144,8 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
 
    if(nburn<0) stop("nburn must be positive")
    if(nsim<0) stop("nsim must be positive")
+   if(ecross_tune_nburn<0) stop("ecross_tune_nburn must be positive")
+   if(ecross_tune_nsim<0) stop("ecross_tune_nsim must be positive")
    if(ecross_control<=0) stop("ecross_control must be positive")
    if(class(ecross_control)=="character" & ecross_control!="tune") stop("ecross_control must be a positive value or set to 'tune'.")
    if(ecross_moderate<=0) stop("ecross_moderate must be positive")
@@ -243,7 +246,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                                ecross_moderate_candidates=ecross_moderate_candidates,
                                y, pihat, z, tgt, x_control, x_moderate,
                                pihatpred, zpred, tpred, xpred_control, xpred_moderate,
-                               nburn=100, nsim=100, ntree_control, ntree_moderate,
+                               nburn=ecross_tune_nburn, nsim=ecross_tune_nsim, ntree_control, ntree_moderate,
                                lambda, sigq, sighat, nu,
                                base_control, power_control, base_moderate, power_moderate,
                                sd_control, sd_moderate, treatment_init,
