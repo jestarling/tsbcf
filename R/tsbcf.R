@@ -220,26 +220,21 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    # Parameter tuning if necessary.
    ################################################################
 
-   print(ecross_control_candidates)
-   print(ecross_moderate_candidates)
-
    # Set up ecross_candidates for tuning.
-   # if(ecross_control=="tune" & is.null(ecross_control_candidates)){
-   #    ecross_control_candidates = c(1,2.5,5)
-   # }
-   # if(ecross_control!="tune"){
-   #    ecross_control_candidates = ecross_control
-   # }
-   #
-   # if(ecross_moderate=="tune" & is.null(ecross_moderate_candidates)){
-   #    ecross_moderate_candidates = c(1,2.5,5,7.5,10)
-   # }
-   # if(ecross_moderate!="tune"){
-   #    ecross_moderate_candidates = ecross_moderate
-   # }
-   #
-   # print(ecross_control_candidates)
-   # print(ecross_moderate_candidates)
+   if(ecross_control=="tune" & is.null(ecross_control_candidates)){
+      ecross_control_candidates = c(1,2.5,5)
+   }
+   if(ecross_control!="tune"){
+      ecross_control_candidates = ecross_control
+   }
+
+   if(ecross_moderate=="tune" & is.null(ecross_moderate_candidates)){
+      ecross_moderate_candidates = c(1,2.5,5,7.5,10)
+   }
+   if(ecross_moderate!="tune"){
+      ecross_moderate_candidates = ecross_moderate
+   }
+
 
    # Perform tuning.
    if(ecross_control=="tune" || ecross_moderate=="tune"){
@@ -248,7 +243,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                                ecross_moderate_candidates=ecross_moderate_candidates,
                                y, pihat, z, tgt, x_control, x_moderate,
                                pihatpred, zpred, tpred, xpred_control, xpred_moderate,
-                               nburn=100, nsim=1000, ntree_control, ntree_moderate,
+                               nburn=100, nsim=100, ntree_control, ntree_moderate,
                                lambda, sigq, sighat, nu,
                                base_control, power_control, base_moderate, power_moderate,
                                sd_control, sd_moderate, treatment_init,
