@@ -107,8 +107,8 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
       #-----------------------------------------------------------------------
       out$ate_t_hat = cbind.data.frame('tgt'=tgrid,
                                        'ate'=apply(out$ate_t_post,2,function(x) mean(x,na.rm=T)),
-                                        'lb'=apply(out$ate_t_post,2,function(x) quantile(x,.025,na.rm=T)),
-                                        'ub'=apply(out$ate_t_post,2,function(x) quantile(x,.975,na.rm=T)))
+                                       'lb'=apply(out$ate_t_post,2,function(x) quantile(x,.025,na.rm=T)),
+                                       'ub'=apply(out$ate_t_post,2,function(x) quantile(x,.975,na.rm=T)))
    }
 
    #-----------------------------------------------------------------------
@@ -148,10 +148,10 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
       # c. Posterior means and credible intervals for ATE at each time.
       #-----------------------------------------------------------------------
       out$ate_t_hat = cbind.data.frame('tgt'=rep(tgrid, each=ng),
-                                  'subgroup'=rep(grps, times=nt),
-                                  'ate'=apply(out$ate_t_post,2,function(x) mean(x,na.rm=T)),
-                                  'lb'=apply(out$ate_t_post,2,function(x) quantile(x,.025,na.rm=T)),
-                                  'ub'=apply(out$ate_t_post,2,function(x) quantile(x,.975,na.rm=T)))
+                                       'subgroup'=rep(grps, times=nt),
+                                       'ate'=apply(out$ate_t_post,2,function(x) mean(x,na.rm=T)),
+                                       'lb'=apply(out$ate_t_post,2,function(x) quantile(x,.025,na.rm=T)),
+                                       'ub'=apply(out$ate_t_post,2,function(x) quantile(x,.975,na.rm=T)))
 
    }
 
@@ -196,7 +196,6 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
 
 
    }
-
 
    ########################################################################
    # Return function output.
