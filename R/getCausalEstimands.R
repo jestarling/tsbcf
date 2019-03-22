@@ -164,10 +164,10 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
       # Estimate in-sample individual treatment effects.
       #-----------------------------------------------------------------------
       out$ate_indiv = cbind.data.frame(
-         'obs'=1:ncol(mymatrix),
-         'mean'=apply(mymatrix,2,function(x) mean(x,na.rm=T)),
-         'lb'=apply(mymatrix,2,function(x) quantile(x,.025,na.rm=T)),
-         'ub'=apply(mymatrix,2,function(x) quantile(x,.975,na.rm=T)))
+         'obs'=1:ncol(my_matrix),
+         'mean'=apply(my_matrix,2,function(x) mean(x,na.rm=T)),
+         'lb'=apply(my_matrix,2,function(x) quantile(x,.025,na.rm=T)),
+         'ub'=apply(my_matrix,2,function(x) quantile(x,.975,na.rm=T)))
 
       #-----------------------------------------------------------------------
       # Estimate out-of-sample individual treatment effects.
