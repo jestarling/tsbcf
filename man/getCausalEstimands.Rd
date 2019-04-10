@@ -2,7 +2,7 @@
 \alias{getCausalEstimands}
 \title{getCausalEstimands}
 \usage{
-getCausalEstimands(tsbcf_output, subgroups=NULL, probit=F, type='ate')
+getCausalEstimands(tsbcf_output, subgroups=NULL, probit=F, relrisk=F)
 }
 \arguments{
 \item{tsbcf_obj}{Output from the tsbcf() function, run with probit=T.}
@@ -12,7 +12,7 @@ getCausalEstimands(tsbcf_output, subgroups=NULL, probit=F, type='ate')
 
 \item{probit}{Indicator for whether the tsbcf() output was generated as a probit model.  Defaults to FALSE.}
 
-\item{Type}{For probit models, indicates whether 'ate' (average treatment effect, on the probability scale), 'rr' (relative risk), or 'nnt' (number needed to treat) should be returned.  If probit=F, this setting is ignored, and average treatment effect is returned.  Note that for probit models, we calculate as follows on probability scale:  w1 = pnorm(mu + tau), w0 = pnorm(mu), ATE = w1-w0, RR = w1/w0, NNT = 1 / (RR-1).}
+\item{relrisk}{Indicator, for probit models, of whether to return the ATE or the relative risk.  Note, for probit models, these are calculated on probability scale; w1 = pnorm(mu + tau), w0 = pnorm(mu), ATE = w1-w0, RR = w1/w0.  Defaults to FALSE; is ignored if probit=F.}
 
 \item{indiv}{Indicator for whether to include individual treatment effect estimates.  Defaults to FALSE.}
 }
@@ -47,7 +47,7 @@ This function returns the posterior draws, and posterior summary information at 
 \examples{
 \dontrun{
 # Function call example is as follows.  Let fit be the output of tsbcf(), run with probit=T.
-  getCausalEstimands(fit, subgroups=NULL, probit=F, ate="rr")
+  getCausalEstimands(fit, subgroups=NULL, probit=T, relrisk=F)
 }
 
 }

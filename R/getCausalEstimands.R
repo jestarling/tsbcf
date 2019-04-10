@@ -4,11 +4,6 @@
 # INPUTS: tsbcf_output: A list; the result of the tsbcf() function from tsbart package.
 #         subgroups:    An optional n-length vector of subgroups for which to estimate ATE over time, and overall.
 #         probit:       A probit indicator.  If yes, transforms counterfactuals to probit scale.
-#         type:         In probit case, indicates type of output to be returned.  Options are:
-#                          - ate (on probability scale) - default setting
-#                          - relative risk
-#                          - number needed to treat
-#                          note: in the continuous repsonse case, this is ignored, and ate is returned.
 #         relrisk:      Indicator for returning output as a relative risk or an ate on prob scale.
 #         indiv:        Indicator for whether to include individual ATE mean/lb/ub estimates, for
 #                        in-sample obs, and for out-of-sample obs if predictions are inlucded in tsbcf_output obejct.
@@ -36,7 +31,7 @@
 #  Relative Risk = w_{it}(1) / w_{it}(0) where Phi() = the standard normal cdf, ie pnorm.
 ########################################################################
 
-getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, type='ate', indiv=F){
+getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F, indiv=F){
 
    # Error checking.
    if(!is.null(subgroups)){
@@ -45,13 +40,8 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, type='ate'
       }
    }
 
-   if(!(type %in% c('ate','rr','nnt'))){
-      stop('type must equal "ate", "rr", or "nnt", case-sensitive.')
-   }
-
-   if((type %in% c('rr','nnt')) & probit==F){
-      warning('Warning: type="rr" or type="nnt" only applicable in probit case. For continuous response,
-              output is ate.')
+   if(relrisk==T & probit==F){
+      warning('relrisk=T ignored unless probit=T.')
    }
 
    # Set up grids of times and groups.
@@ -80,13 +70,10 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, type='ate'
       w1  =  pnorm(tsbcf_output$mu + tsbcf_output$tau)
       w0 =  pnorm(tsbcf_output$mu)
 
-      if(type=="ate"){   # ate (probability scale)
+      if(relrisk==FALSE){
          my_matrix = w1-w0
-      } else if(type=="rr"){ # relative risk
-         my_matrix = w1/w0
       } else{
-         my_matrix = w1/w0 #rel risk
-         my_matrix = 1 / (my_matrix - 1) #nnt.
+         my_matrix = w1/w0
       }
    }
 
@@ -196,23 +183,18 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, type='ate'
             w1  =  pnorm(tsbcf_output$mu_oos + tsbcf_output$tau_oos)
             w0 =  pnorm(tsbcf_output$mu_oos)
 
-            if(type=="ate"){   # ate (probability scale)
+            if(relrisk==FALSE){
                my_matrix = w1-w0
-            } else if(type=="rr"){ # relative risk
-               my_matrix = w1/w0
             } else{
-               my_matrix = w1/w0 #rel risk
-               my_matrix = 1 / (my_matrix - 1) #nnt.
+               my_matrix = w1/w0
             }
          }
 
          # Estimate individual oos treatment effects.
-         out$ate_indiv_oos = cbind.data.frame(
-            'obs'=1:ncol(my_matrix),
-            'mean'=apply(my_matrix,2,function(x) mean(x,na.rm=T)),
-            'lb'=apply(my_matrix,2,function(x) quantile(x,.025,na.rm=T)),
-            'ub'=apply(my_matrix,2,function(x) quantile(x,.975,na.rm=T)))
+         out$ate_indiv_oos;
       }
+
+
    }
 
    ########################################################################
