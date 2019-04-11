@@ -15,7 +15,7 @@
 }
 
 tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
-                  pihatpred=0, zpred=0, tpred=0, xpred_control=matrix(0,0,0), xpred_moderate=matrix(0,0,0),
+                  pihatpred=0, zpred=0, tpred=0, xpred_control=0, xpred_moderate=0,
                   nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
                   lambda=NULL, sigq=.9, sighat=NULL, nu=3,
                   base_control=.95, power_control=2,
@@ -33,6 +33,9 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    ################################################################
    # Capture key arguments.
    ################################################################
+
+   options(expressions=10000)
+
    inputs = cbind.data.frame(
       'arg'=c('nburn','nsim','ntree_control','ntree_moderate','lambda','sigq','sighat','nu','base_control','power_control',
               'base_moderate','power_moderate','sd_control','sd_moderate','treatment_init','use_muscale','use_tauscale',
@@ -51,7 +54,8 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    # These are not output.
    #---------------------------------------------------------------
    predict = 1
-   if(.ident(pihatpred,0) & .ident(zpred,0) & .ident(tpred,0) & .ident(xpred_control,matrix(0,0,0)) & .ident(xpred_moderate,matrix(0,0,0))){
+
+   if(pihatpred==0 && zpred==0 && tpred==0 && xpred_control==0 && xpred_moderate==0){
       predict = 0
       pihatpred = pihat[1:min(3,length(pihat))]
       zpred = z[1:min(3,length(z))]
@@ -210,8 +214,6 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
       offset = qnorm(phat)
    }
 
-
-
    ################################################################
    # Set up ordering, so that z=1 is first in in-samp and out-of-samp datasets.
    ################################################################
@@ -267,6 +269,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    tgt_idx = match(tgt, tgrid)
    tpred_idx = match(tpred,tgrid)
 
+
    ################################################################
    # Call tsbartFit.cpp or tsbartProbit.cpp
    ################################################################
@@ -309,16 +312,27 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    # Rescale output and restore to correct order.
    ################################################################
 
+   # # In-sample
+   # yhat = ybar + out$yhat[,order(perm)] * ysig
+   # mu = ybar + out$mu[,order(perm)] * ysig
+   # tau = out$tau[,order(perm)] * ysig
+   # sig_rescaled = out$sigma * ysig
+   #
+   # # Out-of-sample
+   # yhat_oos = ybar + out$yhat_oos[,order(perm_oos)] * ysig
+   # mu_oos = ybar + out$mu_oos[,order(perm_oos)] * ysig
+   # tau_oos = out$tau_oos[,order(perm_oos)] * ysig
+
    # In-sample
-   yhat = ybar + out$yhat[,order(perm)] * ysig
-   mu = ybar + out$mu[,order(perm)] * ysig
-   tau = out$tau[,order(perm)] * ysig
+   yhat = ybar + out$yhat[,perm_oos] * ysig
+   mu = ybar + out$mu[,perm_oos] * ysig
+   tau = out$tau[,perm_oos] * ysig
    sig_rescaled = out$sigma * ysig
 
    # Out-of-sample
-   yhat_oos = ybar + out$yhat_oos[,order(perm_oos)] * ysig
-   mu_oos = ybar + out$mu_oos[,order(perm_oos)] * ysig
-   tau_oos = out$tau_oos[,order(perm_oos)] * ysig
+   yhat_oos = ybar + out$yhat_oos[,perm_oos] * ysig
+   mu_oos = ybar + out$mu_oos[,perm_oos] * ysig
+   tau_oos = out$tau_oos[,perm_oos] * ysig
 
    # Set up mu_sd and tau_sd draws.
    mu_sd = abs(sd_control * out$eta)
@@ -370,8 +384,6 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
       metrop$tree = c(rep("control",nrow(metrop_con)), rep("moderate",nrow(metrop_mod)))
       rm(metrop_con); rm(metrop_mod)
    }
-
-
 
    ################################################################
    # Return output.
