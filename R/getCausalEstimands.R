@@ -191,7 +191,12 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
          }
 
          # Estimate individual oos treatment effects.
-         out$ate_indiv_oos;
+         out$ate_indiv_oos = cbind.data.frame(
+            'obs'=1:ncol(my_matrix),
+            'mean'=apply(my_matrix,2,function(x) mean(x,na.rm=T)),
+            'lb'=apply(my_matrix,2,function(x) quantile(x,.025,na.rm=T)),
+            'ub'=apply(my_matrix,2,function(x) quantile(x,.975,na.rm=T)))
+
       }
 
 
