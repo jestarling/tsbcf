@@ -40,12 +40,6 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
       }
    }
 
-   if(!is.null(subgroups)){
-      if(length(subgroups)!=ncol(tsbcf_output$tau_oos)){
-         stop('subgroups must be an npred-length vector.')
-      }
-   }
-
    if(relrisk==T & probit==F){
       warning('relrisk=T ignored unless probit=T.')
    }
@@ -68,6 +62,14 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
    pred = 0
    if("tau_oos" %in% names(tsbcf_output)){
       pred=1
+
+      # Check length of subgroups_pred
+      if(!is.null(subgroups_pred)){
+         if(length(subgroups_pred)!=ncol(tsbcf_output$tau_oos)){
+            stop('subgroups_pred must be an npred-length vector.')
+         }
+      }
+
    }
 
    ########################################################################
