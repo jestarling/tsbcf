@@ -105,18 +105,14 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>getCausalEstimands</span>(<span class='no'>tsbcf_output</span>, <span class='kw'>subgroups</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>probit</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>relrisk</span><span class='kw'>=</span><span class='no'>F</span>)</pre>
+    <pre class="usage"><span class='fu'>getCausalEstimands</span>(<span class='no'>fit</span>, <span class='kw'>probit</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>relrisk</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>indiv</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>subgroups</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>subgroups_pred</span><span class='kw'>=</span><span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>tsbcf_obj</th>
+      <th>fit</th>
       <td><p>Output from the tsbcf() function, run with probit=T.</p></td>
-    </tr>
-    <tr>
-      <th>subgroups</th>
-      <td><p>An n-length vector of subgroup values; these can be numeric values, factors, or strings.  Defaults to NULL.  If populated, CATE and CATE_t are returned instead of ATE and ATE_t.</p></td>
     </tr>
     <tr>
       <th>probit</th>
@@ -130,6 +126,14 @@
       <th>indiv</th>
       <td><p>Indicator for whether to include individual treatment effect estimates.  Defaults to FALSE.</p></td>
     </tr>
+    <tr>
+      <th>subgroups</th>
+      <td><p>An n-length vector of subgroup values; these can be numeric values, factors, or strings.  Defaults to NULL.  If populated, CATE and CATE_t are returned instead of ATE and ATE_t.</p></td>
+    </tr>
+    <tr>
+      <th>subgroups_pred</th>
+      <td><p>An npred-length vector of subgroup values; these can be numeric values, factors, or strings.  Defaults to NULL.  If populated, CATE and CATE_t are returned instead of ATE and ATE_t for out of sample predictions.  If fit was not run with predicted values, this input is ignored.</p></td>
+    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -139,17 +143,29 @@
 <p>If subgroups = NULL, a list containing the following components:</p>
 <dt>ate_post</dt><dd><p>A (nsim x n) matrix of posterior average treatment effect draws, where (nsim x n) correspond to the tsbcf_output object.</p></dd>
 
+<dt>ate_post_oos</dt><dd><p>A (nsim x npred) matrix of out-of-sample posterior average treatment effect draws, where (nsim x n) correspond to the tsbcf_output object.  Included if fit contains out-of-sample predictions.</p></dd>
+
 <dt>ate_t_post</dt><dd><p>A (nsim x tlen) matrix of posterior average treatment effect draws, where (nsim x tlen) correspond to the tsbcf_output object.  Each row is an MCMC iteration; each column is a unique tgt point.  This is a matrix of posterior draws averaged over observations within each tgt value.</p></dd>
 
+<dt>ate_t_post_oos</dt><dd><p>A (nsim x tlen) matrix of out-of-sample posterior average treatment effect draws, where (nsim x tlen) correspond to the tsbcf_output object.  Each row is an MCMC iteration; each column is a unique tgt point.  This is a matrix of posterior draws averaged over observations within each tgt value. Included if fit contains out-of-sample predictions.</p></dd>
+
 <dt>ate_t_hat</dt><dd><p>A (tlen x 4) dataframe of posterior summary information for ate_t.  Columns are: tgt, ate=posterior mean, lb=posterior credible interval lower bound, ub=posterior credible interval upper bound.  Rows are tgt values.  Example: ate=apply(ate_t_post,2,mean), and lb=apply(ate_t_post,2,function(x) quantile(x,.025))</p></dd>
+
+<dt>ate_t_hat_oos</dt><dd><p>A (tlen x 4) dataframe of out-of-sample posterior summary information for ate_t.  Columns are: tgt, ate=posterior mean, lb=posterior credible interval lower bound, ub=posterior credible interval upper bound.  Rows are tgt values.  Example: ate=apply(ate_t_post,2,mean), and lb=apply(ate_t_post,2,function(x) quantile(x,.025)).  Included if fit contains out-of-sample predictions.</p></dd>
 
 If subgroups!=NULL, a list containing the following components:
 
 <dt>ate_post</dt><dd><p>A (nsim x ngroups) matrix of posterior conditional average treatment effect draws, where (nsim x ngroups) correspond to the tsbcf_output object and the number of unique subgroups provided.  Each row is an MCMC iteration; each column is a subgroup.</p></dd>
 
+<dt>ate_post_oos</dt><dd><p>A (nsim x ngroups) matrix of out-of-sample posterior conditional average treatment effect draws, where (nsim x ngroups) correspond to the tsbcf_output object and the number of unique subgroups provided.  Each row is an MCMC iteration; each column is a subgroup. Included if fit contains out-of-sample predictions.</p></dd>
+
 <dt>ate_t_post</dt><dd><p>A (nsim x tlen*ngroups) matrix of posterior conditional average treatment effect draws, where (nsim x tlen*ngroups) correspond to the tsbcf_output object and the number of unique subgroups provided.  Each row is an MCMC iteration; each column is a subgroup-tgt value combination.</p></dd>
 
+<dt>ate_t_post_oos</dt><dd><p>A (nsim x tlen*ngroups) matrix of out-of-sample posterior conditional average treatment effect draws, where (nsim x tlen*ngroups) correspond to the tsbcf_output object and the number of unique subgroups provided.  Each row is an MCMC iteration; each column is a subgroup-tgt value combination. Included if fit contains out-of-sample predictions.</p></dd>
+
 <dt>ate_t_hat</dt><dd><p>A (tlen*ngroups x 5) dataframe of posterior summary information for cate_t.  Columns are: tgt, subgroup, ate=posterior mean, lb=posterior credible interval lower bound, ub=posterior credible interval upper bound.  Rows are tgt-subgroup combinations. Example: ate=apply(ate_t_post,2,mean), and lb=apply(ate_t_post,2,function(x) quantile(x,.025))</p></dd>
+
+<dt>ate_t_hat_oos</dt><dd><p>A (tlen*ngroups x 5) dataframe of out-of-sample posterior summary information for cate_t.  Columns are: tgt, subgroup, ate=posterior mean, lb=posterior credible interval lower bound, ub=posterior credible interval upper bound.  Rows are tgt-subgroup combinations. Example: ate=apply(ate_t_post,2,mean), and lb=apply(ate_t_post,2,function(x) quantile(x,.025)). Included if fit contains out-of-sample predictions.</p></dd>
 
 If indiv=TRUE, the following items are also included:
 
@@ -163,7 +179,7 @@ If indiv=TRUE, the following items are also included:
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
 <span class='co'># Function call example is as follows.  Let fit be the output of tsbcf(), run with probit=T.</span>
-  <span class='fu'>getCausalEstimands</span>(<span class='no'>fit</span>, <span class='kw'>subgroups</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>probit</span><span class='kw'>=</span><span class='no'>T</span>, <span class='kw'>relrisk</span><span class='kw'>=</span><span class='no'>F</span>)
+  <span class='fu'>getCausalEstimands</span>(<span class='no'>fit</span>, <span class='kw'>probit</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>relrisk</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>indiv</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>subgroups</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>subgroups_pred</span><span class='kw'>=</span><span class='kw'>NULL</span>)
 <span class='co'># }</span><div class='input'>
 </div></pre>
   </div>

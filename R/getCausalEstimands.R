@@ -31,12 +31,18 @@
 #  Relative Risk = w_{it}(1) / w_{it}(0) where Phi() = the standard normal cdf, ie pnorm.
 ########################################################################
 
-getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F, indiv=F){
+getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgroups=NULL, subgroups_pred=NULL){
 
    # Error checking.
    if(!is.null(subgroups)){
       if(length(subgroups)!=ncol(tsbcf_output$tau)){
          stop('subgroups must be an n-length vector.')
+      }
+   }
+
+   if(!is.null(subgroups)){
+      if(length(subgroups)!=ncol(tsbcf_output$tau_oos)){
+         stop('subgroups must be an npred-length vector.')
       }
    }
 
@@ -58,11 +64,19 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
    # Empty list for output.
    out = list()
 
+   # Indicator for whether out-of-sample data is included in the fit.
+   pred = 0
+   if("tau_oos" %in% names(tsbcf_output)){
+      pred=1
+   }
+
    ########################################################################
-   # In-sample:
+   # Get counterfactuals, and if probit, transform.
    ########################################################################
 
-   # Get counterfactuals, and if probit, transform.
+   #-----------------------------------------------------------------------
+   # In-Sample.
+   #-----------------------------------------------------------------------
    if(probit==FALSE){
       my_matrix = tsbcf_output$tau
 
@@ -78,21 +92,52 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
    }
 
    #-----------------------------------------------------------------------
-   # NO SUBGROUPS: ATE and ATE_t
+   # Out-of-Sample.
    #-----------------------------------------------------------------------
+   if(pred){
+
+      if(probit==FALSE){
+         my_matrix_oos = tsbcf_output$tau_oos
+
+      } else{
+         w1_oos  =  pnorm(tsbcf_output$mu_oos + tsbcf_output$tau_oos)
+         w0_lls =  pnorm(tsbcf_output$mu_oos)
+
+         if(relrisk==FALSE){
+            my_matrix_oos = w1_oos-w0_oos
+         } else{
+            my_matrix_oos = w1_oos/w0_oos
+         }
+      }
+
+   }
+
+   ########################################################################
+   # No Subgroups Case:  Calculate ATE and ATE_t.
+   ########################################################################
    if(is.null(subgroups)){
 
       #-----------------------------------------------------------------------
       # a. Posterior draws for overall ATE.
       #    Sets up nsim-length vector of posterior ate draws.
       #-----------------------------------------------------------------------
+
+      # In-sample.
       ate = apply(my_matrix,1,function(x) mean(x,na.rm=T)) #rowMeans(my_matrix)
       out$ate_post = ate
+
+      # Out-of-sample.
+      if(pred){
+         ate_oos = apply(my_matrix_oos,1,function(x) mean(x,na.rm=T)) #rowMeans(my_matrix)
+         out$ate_post_oos = ate_oos
+      }
 
       #-----------------------------------------------------------------------
       # b. Posterior draws for ATE at each time.
       #    Sets up nsim x length(tgrid) matrix of posterior ate draws for each tgt value (column).
       #-----------------------------------------------------------------------
+
+      # In-sample.
       ate_t = as.data.frame(matrix(0,nrow=nrow(my_matrix),ncol=length(tgrid)))
       colnames(ate_t) = tgrid
 
@@ -102,13 +147,38 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
 
       out$ate_t_post = ate_t
 
-      #-----------------------------------------------------------------------
+      # Out-of-sample.
+      if(pred){
+
+         ate_t_oos = as.data.frame(matrix(0,nrow=nrow(my_matrix_oos),ncol=length(tgrid)))
+         colnames(ate_t_oos) = tgrid
+
+         for(t in 1:length(tgrid)){
+            ate_t_oos[,t] = rowMeans(my_matrix_oos[,which(tsbcf_output$tgt==tgrid[t])])
+         }
+
+         out$ate_t_post_oos = ate_t_oos
+
+      }
+
+      ########################################################################
       # c. Posterior means and credible intervals for ATE at each time.
-      #-----------------------------------------------------------------------
+      ########################################################################
+
+      # In-sample.
       out$ate_t_hat = cbind.data.frame('tgt'=tgrid,
                                        'ate'=apply(out$ate_t_post,2,function(x) mean(x,na.rm=T)),
                                        'lb'=apply(out$ate_t_post,2,function(x) quantile(x,.025,na.rm=T)),
                                        'ub'=apply(out$ate_t_post,2,function(x) quantile(x,.975,na.rm=T)))
+
+      # Out-of-sample.
+      if(pred){
+         out$ate_t_hat_oos = cbind.data.frame('tgt'=tgrid,
+                                              'ate'=apply(out$ate_t_post_oos,2,function(x) mean(x,na.rm=T)),
+                                              'lb'=apply(out$ate_t_post_oos,2,function(x) quantile(x,.025,na.rm=T)),
+                                              'ub'=apply(out$ate_t_post_oos,2,function(x) quantile(x,.975,na.rm=T)))
+      }
+
    }
 
    #-----------------------------------------------------------------------
@@ -119,6 +189,8 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
       #-----------------------------------------------------------------------
       # a. Posterior draws for overall CATE (using subgroups).
       #-----------------------------------------------------------------------
+
+      # In-sample.
       cate = as.data.frame(matrix(0,nrow=nrow(my_matrix),ncol=ng))
       colnames(cate) = grps
 
@@ -128,9 +200,24 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
 
       out$ate_post = cate
 
+      # Out-of-sample.
+      if(pred){
+
+         cate_oos = as.data.frame(matrix(0,nrow=nrow(my_matrix_oos),ncol=ng))
+         colnames(cate_oos) = grps
+
+         for(g in 1:ng){
+            cate_oos[,g] =  rowMeans(my_matrix_oos[,which(subgroups_oos==grps[g])])
+         }
+
+         out$ate_post_oos = cate_oos
+      }
+
       #-----------------------------------------------------------------------
       # . Posterior draws for CATE at each time (using subgroups.)
       #-----------------------------------------------------------------------
+
+      # In-sample.
       cate_t = as.data.frame(matrix(0,nrow=nrow(my_matrix),ncol=ng*nt))
 
       groups_and_times = expand.grid(grps,tgrid)
@@ -144,14 +231,43 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
 
       out$ate_t_post = cate_t
 
+      # Out-of-sample.
+      if(pred){
+
+         cate_t_oos = as.data.frame(matrix(0,nrow=nrow(my_matrix_oos),ncol=ng*nt))
+
+         groups_and_times = expand.grid(grps,tgrid)
+         colnames(cate_t_oos) = do.call(paste0, expand.grid(grps,'-',tgrid))
+
+         for(tg in 1:(ng*nt)){
+            temp = my_matrix_oos[,which(subgroups==groups_and_times[tg,1]
+                                    & tsbcf_output$tgt_oos==groups_and_times[tg,2])]
+            cate_t_oos[,tg] =  apply(temp,1,function(x) mean(x,na.rm=T))
+         }
+
+         out$ate_t_post_oos = cate_t_oos
+
+      }
+
       #-----------------------------------------------------------------------
       # c. Posterior means and credible intervals for ATE at each time.
       #-----------------------------------------------------------------------
+
+      # In-sample.
       out$ate_t_hat = cbind.data.frame('tgt'=rep(tgrid, each=ng),
                                        'subgroup'=rep(grps, times=nt),
                                        'ate'=apply(out$ate_t_post,2,function(x) mean(x,na.rm=T)),
                                        'lb'=apply(out$ate_t_post,2,function(x) quantile(x,.025,na.rm=T)),
                                        'ub'=apply(out$ate_t_post,2,function(x) quantile(x,.975,na.rm=T)))
+
+      # Out-of-sample.
+      if(pred){
+         out$ate_t_hat_oos = cbind.data.frame('tgt'=rep(tgrid, each=ng),
+                                          'subgroup'=rep(grps, times=nt),
+                                          'ate'=apply(out$ate_t_post_oos,2,function(x) mean(x,na.rm=T)),
+                                          'lb'=apply(out$ate_t_post_oos,2,function(x) quantile(x,.025,na.rm=T)),
+                                          'ub'=apply(out$ate_t_post_oos,2,function(x) quantile(x,.975,na.rm=T)))
+      }
 
    }
 
@@ -160,45 +276,21 @@ getCausalEstimands = function(tsbcf_output, subgroups=NULL, probit=F, relrisk=F,
    ########################################################################
    if(indiv){
 
-      #-----------------------------------------------------------------------
       # Estimate in-sample individual treatment effects.
-      #-----------------------------------------------------------------------
       out$ate_indiv = cbind.data.frame(
          'obs'=1:ncol(my_matrix),
          'mean'=apply(my_matrix,2,function(x) mean(x,na.rm=T)),
          'lb'=apply(my_matrix,2,function(x) quantile(x,.025,na.rm=T)),
          'ub'=apply(my_matrix,2,function(x) quantile(x,.975,na.rm=T)))
 
-      #-----------------------------------------------------------------------
       # Estimate out-of-sample individual treatment effects.
-      #-----------------------------------------------------------------------
-
-      if("tau_oos" %in% names(tsbcf_output)){
-
-         # Get counterfactuals, and if probit, transform.
-         if(probit==FALSE){
-            my_matrix_oos = tsbcf_output$tau_oos
-
-         } else{
-            w1  =  pnorm(tsbcf_output$mu_oos + tsbcf_output$tau_oos)
-            w0 =  pnorm(tsbcf_output$mu_oos)
-
-            if(relrisk==FALSE){
-               my_matrix = w1-w0
-            } else{
-               my_matrix = w1/w0
-            }
-         }
-
-         # Estimate individual oos treatment effects.
+      if(pred){
          out$ate_indiv_oos = cbind.data.frame(
-            'obs'=1:ncol(my_matrix),
-            'mean'=apply(my_matrix,2,function(x) mean(x,na.rm=T)),
-            'lb'=apply(my_matrix,2,function(x) quantile(x,.025,na.rm=T)),
-            'ub'=apply(my_matrix,2,function(x) quantile(x,.975,na.rm=T)))
-
+            'obs'=1:ncol(my_matrix_oos),
+            'mean'=apply(my_matrix_oos,2,function(x) mean(x,na.rm=T)),
+            'lb'=apply(my_matrix_oos,2,function(x) quantile(x,.025,na.rm=T)),
+            'ub'=apply(my_matrix_oos,2,function(x) quantile(x,.975,na.rm=T)))
       }
-
 
    }
 

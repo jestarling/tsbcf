@@ -55,7 +55,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    #---------------------------------------------------------------
    predict = 1
 
-   if(pihatpred==0 && zpred==0 && tpred==0 && xpred_control==0 && xpred_moderate==0){
+   if(.ident(pihatpred, zpred, tpred, xpred_control, xpred_moderate)){
       predict = 0
       pihatpred = pihat[1:min(3,length(pihat))]
       zpred = z[1:min(3,length(z))]
@@ -312,27 +312,16 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    # Rescale output and restore to correct order.
    ################################################################
 
-   # # In-sample
-   # yhat = ybar + out$yhat[,order(perm)] * ysig
-   # mu = ybar + out$mu[,order(perm)] * ysig
-   # tau = out$tau[,order(perm)] * ysig
-   # sig_rescaled = out$sigma * ysig
-   #
-   # # Out-of-sample
-   # yhat_oos = ybar + out$yhat_oos[,order(perm_oos)] * ysig
-   # mu_oos = ybar + out$mu_oos[,order(perm_oos)] * ysig
-   # tau_oos = out$tau_oos[,order(perm_oos)] * ysig
-
    # In-sample
-   yhat = ybar + out$yhat[,perm_oos] * ysig
-   mu = ybar + out$mu[,perm_oos] * ysig
-   tau = out$tau[,perm_oos] * ysig
+   yhat = ybar + out$yhat[,order(perm)] * ysig
+   mu = ybar + out$mu[,order(perm)] * ysig
+   tau = out$tau[,order(perm)] * ysig
    sig_rescaled = out$sigma * ysig
 
    # Out-of-sample
-   yhat_oos = ybar + out$yhat_oos[,perm_oos] * ysig
-   mu_oos = ybar + out$mu_oos[,perm_oos] * ysig
-   tau_oos = out$tau_oos[,perm_oos] * ysig
+   yhat_oos = ybar + out$yhat_oos[,order(perm_oos)] * ysig
+   mu_oos = ybar + out$mu_oos[,order(perm_oos)] * ysig
+   tau_oos = out$tau_oos[,order(perm_oos)] * ysig
 
    # Set up mu_sd and tau_sd draws.
    mu_sd = abs(sd_control * out$eta)
