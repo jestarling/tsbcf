@@ -65,11 +65,17 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
 
       # Check length of subgroups_pred
       if(!is.null(subgroups_pred)){
+
          if(length(subgroups_pred)!=ncol(tsbcf_output$tau_oos)){
             stop('subgroups_pred must be an npred-length vector.')
          }
       }
 
+   }
+
+   # If subgroups_pred provided and no fits, give warning.
+   if(!is.null(subgroups_pred) & ("tau_oos" %in% names(tsbcf_output))){
+      warning("subgroups_pred is being ignored; no out-of-sample predictions in fit.")
    }
 
    ########################################################################
