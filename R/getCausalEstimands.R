@@ -109,7 +109,7 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
 
       } else{
          w1_oos  =  pnorm(tsbcf_output$mu_oos + tsbcf_output$tau_oos)
-         w0_lls =  pnorm(tsbcf_output$mu_oos)
+         w0_oos =  pnorm(tsbcf_output$mu_oos)
 
          if(relrisk==FALSE){
             my_matrix_oos = w1_oos-w0_oos

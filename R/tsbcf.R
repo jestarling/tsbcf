@@ -15,7 +15,7 @@
 }
 
 tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
-                  pihatpred=0, zpred=0, tpred=0, xpred_control=0, xpred_moderate=0,
+                  pihatpred=NULL, zpred=NULL, tpred=NULL, xpred_control=NULL, xpred_moderate=NULL,
                   nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
                   lambda=NULL, sigq=.9, sighat=NULL, nu=3,
                   base_control=.95, power_control=2,
@@ -55,7 +55,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    #---------------------------------------------------------------
    predict = 1
 
-   if((pihatpred==0) + (zpred==0) + (tpred==0)){
+   if(sum(is.null(pihatpred), is.null(zpred), is.null(tpred), is.null(xpred_control), is.null(xpred_moderate))>0){
       predict = 0
       pihatpred = pihat[1:min(3,length(pihat))]
       zpred = z[1:min(3,length(z))]

@@ -108,7 +108,7 @@ with unsmoothed covariates x_control for prognostic tree fit and x_moderate for 
     </div>
 
     <pre class="usage"><span class='fu'>tsbcf</span>(<span class='no'>y</span>, <span class='no'>pihat</span>, <span class='no'>z</span>, <span class='no'>tgt</span>, <span class='no'>x_control</span>, <span class='no'>x_moderate</span>,
-                  <span class='kw'>pihatpred</span><span class='kw'>=</span><span class='fl'>0</span>, <span class='kw'>zpred</span><span class='kw'>=</span><span class='fl'>0</span>, <span class='kw'>tpred</span><span class='kw'>=</span><span class='fl'>0</span>, <span class='kw'>xpred_control</span><span class='kw'>=</span><span class='fl'>0</span>, <span class='kw'>xpred_moderate</span><span class='kw'>=</span><span class='fl'>0</span>,
+                  <span class='kw'>pihatpred</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>zpred</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>tpred</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>xpred_control</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>xpred_moderate</span><span class='kw'>=</span><span class='kw'>NULL</span>,
                   <span class='kw'>nburn</span><span class='kw'>=</span><span class='fl'>100</span>, <span class='kw'>nsim</span><span class='kw'>=</span><span class='fl'>1000</span>, <span class='kw'>ntree_control</span><span class='kw'>=</span><span class='fl'>200</span>, <span class='kw'>ntree_moderate</span><span class='kw'>=</span><span class='fl'>50</span>,
                   <span class='kw'>lambda</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>sigq</span><span class='kw'>=</span><span class='fl'>.9</span>, <span class='kw'>sighat</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>nu</span><span class='kw'>=</span><span class='fl'>3</span>,
                   <span class='kw'>base_control</span><span class='kw'>=</span><span class='fl'>.95</span>, <span class='kw'>power_control</span><span class='kw'>=</span><span class='fl'>2</span>,
@@ -343,7 +343,7 @@ Function call example is as follows.
 
 # Fit model.
 fit = tsbcf(y, pihat, z, tgt, x_control, x_moderate,
-                  pihatpred=0, zpred=0, tpred=0, xpred_control=0, xpred_moderate=0,
+                  pihatpred=NULL, zpred=NULL, tpred=NULL, xpred_control=NULL, xpred_moderate=NULL,
                   nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
                   lambda=NULL, sigq=.9, sighat=NULL, nu=3,
                   base_control=.95, power_control=2,

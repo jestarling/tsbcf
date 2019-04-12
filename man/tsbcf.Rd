@@ -3,7 +3,7 @@
 \title{tsbcf: Fits tsbcf (Bayesian Causal Forests with Targeted Smoothing) model for continuous or binary responses.}
 \usage{
 tsbcf(y, pihat, z, tgt, x_control, x_moderate,
-                  pihatpred=0, zpred=0, tpred=0, xpred_control=0, xpred_moderate=0,
+                  pihatpred=NULL, zpred=NULL, tpred=NULL, xpred_control=NULL, xpred_moderate=NULL,
                   nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
                   lambda=NULL, sigq=.9, sighat=NULL, nu=3,
                   base_control=.95, power_control=2,
@@ -157,7 +157,7 @@ Function call example is as follows.
 
 # Fit model.
 fit = tsbcf(y, pihat, z, tgt, x_control, x_moderate,
-                  pihatpred=0, zpred=0, tpred=0, xpred_control=0, xpred_moderate=0,
+                  pihatpred=NULL, zpred=NULL, tpred=NULL, xpred_control=NULL, xpred_moderate=NULL,
                   nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
                   lambda=NULL, sigq=.9, sighat=NULL, nu=3,
                   base_control=.95, power_control=2,
