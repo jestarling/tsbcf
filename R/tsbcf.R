@@ -55,7 +55,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    #---------------------------------------------------------------
    predict = 1
 
-   if(.ident(pihatpred, zpred, tpred, xpred_control, xpred_moderate)){
+   if((pihatpred==0) + (zpred==0) + (tpred==0)){
       predict = 0
       pihatpred = pihat[1:min(3,length(pihat))]
       zpred = z[1:min(3,length(z))]
