@@ -215,7 +215,7 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
          colnames(cate_oos) = grps
 
          for(g in 1:ng){
-            cate_oos[,g] =  rowMeans(my_matrix_oos[,which(subgroups_oos==grps[g])])
+            cate_oos[,g] =  rowMeans(my_matrix_oos[,which(subgroups_pred==grps[g])])
          }
 
          out$ate_post_oos = cate_oos
