@@ -150,7 +150,7 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
       colnames(ate_t) = tgrid
 
       for(t in 1:length(tgrid)){
-         ate_t[,t] = rowMeans(my_matrix[,which(tsbcf_output$tgt==tgrid[t])])
+         ate_t[,t] = rowMeans(my_matrix[,which(tsbcf_output$tgt==tgrid[t]),drop=F])
       }
 
       out$ate_t_post = ate_t
@@ -162,7 +162,7 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
          colnames(ate_t_oos) = tgrid
 
          for(t in 1:length(tgrid)){
-            ate_t_oos[,t] = rowMeans(my_matrix_oos[,which(tsbcf_output$tgt==tgrid[t])])
+            ate_t_oos[,t] = rowMeans(my_matrix_oos[,which(tsbcf_output$tgt==tgrid[t]),drop=F])
          }
 
          out$ate_t_post_oos = ate_t_oos
@@ -203,7 +203,7 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
       colnames(cate) = grps
 
       for(g in 1:ng){
-         cate[,g] =  rowMeans(my_matrix[,which(subgroups==grps[g])])
+         cate[,g] =  rowMeans(my_matrix[,which(subgroups==grps[g]),drop=F])
       }
 
       out$ate_post = cate
@@ -215,7 +215,7 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
          colnames(cate_oos) = grps
 
          for(g in 1:ng){
-            cate_oos[,g] =  rowMeans(my_matrix_oos[,which(subgroups_pred==grps[g])])
+            cate_oos[,g] =  rowMeans(my_matrix_oos[,which(subgroups_pred==grps[g]),drop=F])
          }
 
          out$ate_post_oos = cate_oos
@@ -233,7 +233,7 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
 
       for(tg in 1:(ng*nt)){
          temp = my_matrix[,which(subgroups==groups_and_times[tg,1]
-                                 & tsbcf_output$tgt==groups_and_times[tg,2])]
+                                 & tsbcf_output$tgt==groups_and_times[tg,2]),drop=F]
          cate_t[,tg] =  apply(temp,1,function(x) mean(x,na.rm=T))
       }
 
@@ -249,7 +249,7 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
 
          for(tg in 1:(ng*nt)){
             temp = my_matrix_oos[,which(subgroups==groups_and_times[tg,1]
-                                    & tsbcf_output$tgt_oos==groups_and_times[tg,2])]
+                                    & tsbcf_output$tgt_oos==groups_and_times[tg,2]),drop=F]
             cate_t_oos[,tg] =  apply(temp,1,function(x) mean(x,na.rm=T))
          }
 
