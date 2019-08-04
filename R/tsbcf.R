@@ -291,6 +291,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                      use_muscale=use_muscale, use_tauscale=use_tauscale,
                      treef_name_="tsbtrees.txt", save_trees=FALSE, silent_mode=!verbose)
    } else{
+
       out =  tsbcfProbit(y = y_scale[perm], yobs=yobs[perm], z = z[perm], zpred = zpred[perm_oos], tgt = tgt[perm],
                          tpred = tpred[perm_oos],
                          x_con = t(xx_control[perm,]), x_mod = t(xx_moderate[perm,]),

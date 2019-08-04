@@ -156,8 +156,8 @@ List tsbcfProbit(arma::vec y,       // True latent variable values of the respon
    size_t p_con = x_con.size()/n;   // Number of prognostic covariates
    size_t p_mod = x_mod.size()/n;   // Number of treatment covariates.
 
-   size_t p_con_pred = xpred_con.size()/n; // Number of oos prognostic covariates.
-   size_t p_mod_pred = xpred_con.size()/n; // Number of oos treatment covariates.
+   size_t p_con_pred = xpred_con.size()/n_pred; // Number of oos prognostic covariates.
+   size_t p_mod_pred = xpred_mod.size()/n_pred; // Number of oos treatment covariates.
 
    // Check correct number of covariates.
    double npred_con = xpred_con.size()/p_con;   // Number of covariates for prognostic.
@@ -332,8 +332,14 @@ List tsbcfProbit(arma::vec y,       // True latent variable values of the respon
    di_mod_pred.n = 0;
 
    if(n_pred>0){
-      di_mod_pred.n = n_pred; di_mod_pred.p = p_mod_pred; di_mod_pred.x = &xpred_mod[0]; di_mod_pred.y=0; //there are no y's.
-      di_mod_pred.tref = unique(tpred); di_mod_pred.tlen = tlen; di_mod_pred.t = &tpred[0];
+      di_mod_pred.n = n_pred;
+      di_mod_pred.p = p_mod_pred;
+      di_mod_pred.x = &xpred_mod[0];
+      di_mod_pred.y=0; //there are no y's.
+
+      di_mod_pred.tref = unique(tpred);
+      di_mod_pred.tlen = tlen;
+      di_mod_pred.t = &tpred[0];
    }
 
    // TROUBLESHOOTING:
