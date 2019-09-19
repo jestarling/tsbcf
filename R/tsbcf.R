@@ -180,7 +180,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    if(any(is.na(xpred_moderate))) stop("Missing values in xpred_moderate")
 
    if(length(unique(y))<5 && probit==FALSE) warning("y appears to be discrete")
-      # Ok for probit bc might be initializing 0/1 to two latent values.
+   # Ok for probit bc might be initializing 0/1 to two latent values.
 
    if(any(pihat>1 || pihat<0)) stop("pihat must be in 0-1 range.")
    if(any(pihatpred>1 || pihatpred<0)) stop("pihatpred must be in 0-1 range.")
@@ -261,13 +261,18 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
 
       phat = sum(yobs==1)/length(yobs)
       rrhat = (sum(yobs==1 & z==1) / sum(z==1)) /
-              (sum(yobs==1 & z==0) / sum(z==0))
+         (sum(yobs==1 & z==0) / sum(z==0))
 
       sd_control = abs(qnorm(phat))
       sd_moderate = abs(tau_calc(phat, rrhat))
 
-      inputs$sd_control = sd_control
-      inputs$sd_moderate = sd_moderate
+      print(paste0('Setting probit scales:'))
+      print(paste0('sd_control: ', sd_control, ', sd_moderate: ', sd_moderate))
+
+      # Update inputs.
+      levels(inputs$value) <- c(levels(inputs$value), sd_control, sd_moderate)
+      inputs$value[which(inputs$arg=="sd_control")] = sd_control
+      inputs$value[which(inputs$arg=="sd_moderate")] = sd_moderate
 
    }
 
@@ -483,4 +488,4 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
 
    # Return output.
    return(out)
-}
+   }
