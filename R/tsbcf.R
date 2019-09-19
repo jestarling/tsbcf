@@ -14,6 +14,44 @@
    return( all( out ) )
 }
 
+### Tau solver for estimating prior probit scales (sd_control, sd_moderate) from data if indicated.
+tau_calc = function(phat, rr){
+
+   mu = qnorm(phat)
+   f = function(x){rr-pnorm(mu+x)/pnorm(mu)}
+
+   # Error handling for viable combination of phat and rr.
+   mytry = try(uniroot(f, lower=-10, upper=10, extendInt = "yes"), silent=T)
+
+   # If valid combination, return calculated tau.  Else print warning and calculate
+   # tau for max rr possible given the input phat.
+   if(is(mytry, "try-error")){
+
+      # Print warning message.
+      print('Warning: baseline risk (phat) and relative risk (rr) input combination invalid. Calculating tau based on max possible rr given phat.')
+
+      # De-crement rr until it is possible to achieve rr with any tau, given phat.
+      # Output this tau.
+      err_flag = 1
+      while(err_flag==1){
+         rr = rr - .01
+         mytry = try(uniroot(f, lower=-10, upper=10, extendInt = "yes"), silent=T)
+
+         if(!is(mytry, "try-error")){
+            tau = uniroot(f, lower=-10, upper=10, extendInt = "yes")$root
+            err_flag = 0
+            print(paste0('Max possible relative risk given phat: ', rr))
+         }
+      }
+
+   } else{
+      tau = uniroot(f, lower=-10, upper=10, extendInt = "yes")$root
+   }
+
+   return(tau)
+}
+
+### Main tsbcf wrapper function.
 tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                   pihatpred=NULL, zpred=NULL, tpred=NULL, xpred_control=NULL, xpred_moderate=NULL,
                   nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
@@ -28,7 +66,8 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                   ecross_moderate_candidates = NULL,
                   ecross_tune_nsim=100, ecross_tune_nburn=1000,
                   pihat_in_trt=F,
-                  probit=FALSE, yobs=NULL, verbose=T, mh=F, save_inputs=T){
+                  probit=FALSE, yobs=NULL, set_probit_scales=F,
+                  verbose=T, mh=F, save_inputs=T){
 
    ################################################################
    # Capture key arguments.
@@ -212,6 +251,21 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    if(probit==TRUE){
       phat = mean(unlist(yobs))
       offset = qnorm(phat)
+   }
+
+   ################################################################
+   # Probit-scaled default control_sd and moderate_sd, based on
+   # estimates of baseline risk and relative risk in data, if indicated.
+   ################################################################
+   if(probit==TRUE & set_probit_scales==T){
+
+      phat = sum(yobs==1)/length(yobs)
+      rrhat = (sum(yobs==1 & z==1) / sum(z==1)) /
+              (sum(yobs==1 & z==0) / sum(z==0))
+
+      sd_control = abs(qnorm(phat))
+      sd_moderate = abs(tau_calc(phat, rrhat))
+
    }
 
    ################################################################

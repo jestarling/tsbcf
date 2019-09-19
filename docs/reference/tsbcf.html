@@ -120,7 +120,7 @@ with unsmoothed covariates x_control for prognostic tree fit and x_moderate for 
                   <span class='kw'>ecross_control_candidates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ecross_moderate_candidates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
                   <span class='kw'>ecross_tune_nburn</span><span class='kw'>=</span><span class='fl'>100</span>, <span class='kw'>ecross_tune_nsim</span><span class='kw'>=</span><span class='fl'>1000</span>,
                   <span class='kw'>pihat_in_trt</span><span class='kw'>=</span><span class='no'>T</span>,
-                  <span class='kw'>probit</span><span class='kw'>=</span><span class='fl'>FALSE</span>, <span class='kw'>yobs</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>verbose</span><span class='kw'>=</span><span class='no'>T</span>, <span class='kw'>mh</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>save_inputs</span><span class='kw'>=</span><span class='no'>T</span>)</pre>
+                  <span class='kw'>probit</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>yobs</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>set_probit_scales</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>verbose</span><span class='kw'>=</span><span class='no'>T</span>, <span class='kw'>mh</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>save_inputs</span><span class='kw'>=</span><span class='no'>T</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -274,6 +274,10 @@ with unsmoothed covariates x_control for prognostic tree fit and x_moderate for 
       <td><p>Length n vector of binary responses; only populated for probit=1 case.</p></td>
     </tr>
     <tr>
+      <th>set_probit_scales</th>
+      <td><p>Boolean, only used if probit==TRUE.  If FALSE, user inputs or default sd_control and sd_moderate values are used.  (Defaults are 2*sd(y) and sd(y).)  If TRUE, sd_control and sd_moderate are estimated as described in Starling 2019, using estimates of baseline risk and relative risk from the data.</p></td>
+    </tr>
+    <tr>
       <th>verbose</th>
       <td><p>Boolean for writing progress report to console.</p></td>
     </tr>
@@ -355,7 +359,7 @@ fit = tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   ecross_control_candidates = NULL, ecross_moderate_candidates = NULL,
                   ecross_tune_nburn=100, ecross_tune_nsim=1000,
                   pihat_in_trt=T,
-                  probit=FALSE, yobs=NULL, verbose=T, mh=F, save_inputs=T)
+                  probit=FALSE, yobs=NULL, set_probit_scales=F, verbose=T, mh=F, save_inputs=T)
 # }
 </pre>
   </div>

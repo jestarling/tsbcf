@@ -15,7 +15,7 @@ tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   ecross_control_candidates = NULL, ecross_moderate_candidates = NULL,
                   ecross_tune_nburn=100, ecross_tune_nsim=1000,
                   pihat_in_trt=T,
-                  probit=FALSE, yobs=NULL, verbose=T, mh=F, save_inputs=T)
+                  probit=F, yobs=NULL, set_probit_scales=F, verbose=T, mh=F, save_inputs=T)
 }
 \arguments{
 \item{y}{Length n vector with continuous response values.  In probit case, should contain initializations for latent variables (+/- 1.96, for example).}
@@ -91,6 +91,8 @@ tsbcf(y, pihat, z, tgt, x_control, x_moderate,
 \item{probit}{0 indicates continuous response; 1 indicates probit response.  Default is 0.  If 1, then yobs must be populated.}
 
 \item{yobs}{Length n vector of binary responses; only populated for probit=1 case.}
+
+\item{set_probit_scales}{Boolean, only used if probit==TRUE.  If FALSE, user inputs or default sd_control and sd_moderate values are used.  (Defaults are 2*sd(y) and sd(y).)  If TRUE, sd_control and sd_moderate are estimated as described in Starling 2019, using estimates of baseline risk and relative risk from the data.}
 
 \item{verbose}{Boolean for writing progress report to console.}
 
@@ -169,7 +171,7 @@ fit = tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   ecross_control_candidates = NULL, ecross_moderate_candidates = NULL,
                   ecross_tune_nburn=100, ecross_tune_nsim=1000,
                   pihat_in_trt=T,
-                  probit=FALSE, yobs=NULL, verbose=T, mh=F, save_inputs=T)
+                  probit=FALSE, yobs=NULL, set_probit_scales=F, verbose=T, mh=F, save_inputs=T)
 }}
 \author{
 Jennifer E. Starling
