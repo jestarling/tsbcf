@@ -266,6 +266,9 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
       sd_control = abs(qnorm(phat))
       sd_moderate = abs(tau_calc(phat, rrhat))
 
+      inputs$sd_control = sd_control
+      inputs$sd_moderate = sd_moderate
+
    }
 
    ################################################################
