@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>tsbcf: Fits tsbcf (Bayesian Causal Forests with Targeted Smoothing) model for continuous or binary responses. — tsbcf • tsbcf</title>
+<title>tsbcf: Fits the Targeted Smooth Bayesian Causal Forests model for continuous or binary responses. — tsbcf • tsbcf</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,7 +30,7 @@
 
 
 
-<meta property="og:title" content="tsbcf: Fits tsbcf (Bayesian Causal Forests with Targeted Smoothing) model for continuous or binary responses. — tsbcf" />
+<meta property="og:title" content="tsbcf: Fits the Targeted Smooth Bayesian Causal Forests model for continuous or binary responses. — tsbcf" />
 
 <meta property="og:description" content="This function implements the tsbcf method for a continuous or binary responses, smoothing over the covariate tgt,
 with unsmoothed covariates x_control for prognostic tree fit and x_moderate for treatment tree fit.  Predicts function values at a set of new time points and covariates." />
@@ -95,7 +95,7 @@ with unsmoothed covariates x_control for prognostic tree fit and x_moderate for 
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>tsbcf: Fits tsbcf (Bayesian Causal Forests with Targeted Smoothing) model for continuous or binary responses.</h1>
+    <h1>tsbcf: Fits the Targeted Smooth Bayesian Causal Forests model for continuous or binary responses.</h1>
     
     <div class="hidden name"><code>tsbcf.Rd</code></div>
     </div>
@@ -120,7 +120,7 @@ with unsmoothed covariates x_control for prognostic tree fit and x_moderate for 
                   <span class='kw'>ecross_control_candidates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>ecross_moderate_candidates</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
                   <span class='kw'>ecross_tune_nburn</span><span class='kw'>=</span><span class='fl'>100</span>, <span class='kw'>ecross_tune_nsim</span><span class='kw'>=</span><span class='fl'>1000</span>,
                   <span class='kw'>pihat_in_trt</span><span class='kw'>=</span><span class='no'>T</span>,
-                  <span class='kw'>probit</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>yobs</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>set_probit_scales</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>verbose</span><span class='kw'>=</span><span class='no'>T</span>, <span class='kw'>mh</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>save_inputs</span><span class='kw'>=</span><span class='no'>T</span>)</pre>
+                  <span class='kw'>probit</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>yobs</span><span class='kw'>=</span><span class='kw'>NULL</span>, <span class='kw'>verbose</span><span class='kw'>=</span><span class='no'>T</span>, <span class='kw'>mh</span><span class='kw'>=</span><span class='no'>F</span>, <span class='kw'>save_inputs</span><span class='kw'>=</span><span class='no'>T</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -219,11 +219,11 @@ with unsmoothed covariates x_control for prognostic tree fit and x_moderate for 
     </tr>
     <tr>
       <th>sd_control</th>
-      <td><p>SD(mu(x,t)) marginally at any covariate value (or its prior median if use_muscale=TRUE), for prognostic fit.  Default is 2*sd(y).</p></td>
+      <td><p>Marginal scale for the mu(x,t) control fit at any covariate value.  Default is 2*sd(y).  If use_muscale=F, corresponds to sigma_mu in original BART model.</p></td>
     </tr>
     <tr>
       <th>sd_moderate</th>
-      <td><p>SD(tau(x,t)) marginally at any covariate value (or its prior median if use_tauscale=TRUE), for treatment fit.  Default is sd(y).</p></td>
+      <td><p>Marginal scale for the tau(x,t) treatment fit at any covariate value.  Default is 2*sd(y). If use_tauscale=F, corresponds to sigma_mu in original BART model.</p></td>
     </tr>
     <tr>
       <th>treatment_init</th>
@@ -274,10 +274,6 @@ with unsmoothed covariates x_control for prognostic tree fit and x_moderate for 
       <td><p>Length n vector of binary responses; only populated for probit=1 case.</p></td>
     </tr>
     <tr>
-      <th>set_probit_scales</th>
-      <td><p>Boolean, only used if probit==TRUE.  If FALSE, user inputs or default sd_control and sd_moderate values are used.  (Defaults are 2*sd(y) and sd(y).)  If TRUE, sd_control and sd_moderate are estimated as described in Starling 2019, using estimates of baseline risk and relative risk from the data.</p></td>
-    </tr>
-    <tr>
       <th>verbose</th>
       <td><p>Boolean for writing progress report to console.</p></td>
     </tr>
@@ -312,17 +308,9 @@ with unsmoothed covariates x_control for prognostic tree fit and x_moderate for 
 
 <dt>sigma</dt><dd><p>A nsim-length vector containing the MCMC draws for sigma.</p></dd>
 
-<dt>mu_sd</dt><dd><p>A nsim-length vector containing the MCMC draws for the standard deviation of the prognostic tree fits.  Equal to abs(sd_control * eta).</p></dd>
+<dt>mu_sd</dt><dd><p>A nsim-length vector containing the MCMC draws for the standard deviation of the prognostic tree fits.</p></dd>
 
-<dt>tau_sd</dt><dd><p>A nsim-length vector containing the MCMC draws for the standard deviation of the treatment tree fits.  Equal to abs(sd_moderate * (bscale1-bscale0)).</p></dd>
-
-<dt>bscale1</dt><dd><p>A nsim-length vector containing the MCMC draws for b1, the scale for the treatment trees where z=1.</p></dd>
-
-<dt>bscale0</dt><dd><p>A nsim-length vector containing the MCMC draws for b0, the scale for the treatment trees where z=0.</p></dd>
-
-<dt>eta</dt><dd><p>A nsim-length vector containing the MCMC draws for eta, the scale for the prognostic trees.</p></dd>
-
-<dt>gamma</dt><dd><p>A nsim-length vector containing the MCMC draws for gamma, the prior sd for eta.</p></dd>
+<dt>tau_sd</dt><dd><p>A nsim-length vector containing the MCMC draws for the standard deviation of the treatment tree fits.</p></dd>
 
 <dt>ecross_control</dt><dd><p>The expected number of crossings for the prognostic tree fit.</p></dd>
 
@@ -359,7 +347,7 @@ fit = tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   ecross_control_candidates = NULL, ecross_moderate_candidates = NULL,
                   ecross_tune_nburn=100, ecross_tune_nsim=1000,
                   pihat_in_trt=T,
-                  probit=FALSE, yobs=NULL, set_probit_scales=F, verbose=T, mh=F, save_inputs=T)
+                  probit=FALSE, yobs=NULL, verbose=T, mh=F, save_inputs=T)
 # }
 </pre>
   </div>

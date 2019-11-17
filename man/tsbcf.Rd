@@ -1,6 +1,6 @@
 \name{tsbcf}
 \alias{tsbcf}
-\title{tsbcf: Fits tsbcf (Bayesian Causal Forests with Targeted Smoothing) model for continuous or binary responses.}
+\title{tsbcf: Fits the Targeted Smooth Bayesian Causal Forests model for continuous or binary responses.}
 \usage{
 tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   pihatpred=NULL, zpred=NULL, tpred=NULL, xpred_control=NULL, xpred_moderate=NULL,
@@ -15,7 +15,7 @@ tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   ecross_control_candidates = NULL, ecross_moderate_candidates = NULL,
                   ecross_tune_nburn=100, ecross_tune_nsim=1000,
                   pihat_in_trt=T,
-                  probit=F, yobs=NULL, set_probit_scales=F, verbose=T, mh=F, save_inputs=T)
+                  probit=F, yobs=NULL, verbose=T, mh=F, save_inputs=T)
 }
 \arguments{
 \item{y}{Length n vector with continuous response values.  In probit case, should contain initializations for latent variables (+/- 1.96, for example).}
@@ -64,9 +64,9 @@ tsbcf(y, pihat, z, tgt, x_control, x_moderate,
 
 \item{power_moderate}{Power for treatment tree prior.  Defaults to 3.}
 
-\item{sd_control}{SD(mu(x,t)) marginally at any covariate value (or its prior median if use_muscale=TRUE), for prognostic fit.  Default is 2*sd(y).}
+\item{sd_control}{Marginal scale for the mu(x,t) control fit at any covariate value.  Default is 2*sd(y).  If use_muscale=F, corresponds to sigma_mu in original BART model.}
 
-\item{sd_moderate}{SD(tau(x,t)) marginally at any covariate value (or its prior median if use_tauscale=TRUE), for treatment fit.  Default is sd(y).}
+\item{sd_moderate}{Marginal scale for the tau(x,t) treatment fit at any covariate value.  Default is 2*sd(y). If use_tauscale=F, corresponds to sigma_mu in original BART model.}
 
 \item{treatment_init}{T-length vector of initial treatment values.  Defaults to 1's.  Must be length of number of unique values in tgt and tpred combined.}
 
@@ -91,8 +91,6 @@ tsbcf(y, pihat, z, tgt, x_control, x_moderate,
 \item{probit}{0 indicates continuous response; 1 indicates probit response.  Default is 0.  If 1, then yobs must be populated.}
 
 \item{yobs}{Length n vector of binary responses; only populated for probit=1 case.}
-
-\item{set_probit_scales}{Boolean, only used if probit==TRUE.  If FALSE, user inputs or default sd_control and sd_moderate values are used.  (Defaults are 2*sd(y) and sd(y).)  If TRUE, sd_control and sd_moderate are estimated as described in Starling 2019, using estimates of baseline risk and relative risk from the data.}
 
 \item{verbose}{Boolean for writing progress report to console.}
 
@@ -122,17 +120,9 @@ A list containing the following items:
 
 \item{sigma}{A nsim-length vector containing the MCMC draws for sigma.}
 
-\item{mu_sd}{A nsim-length vector containing the MCMC draws for the standard deviation of the prognostic tree fits.  Equal to abs(sd_control * eta).}
+\item{mu_sd}{A nsim-length vector containing the MCMC draws for the standard deviation of the prognostic tree fits.}
 
-\item{tau_sd}{A nsim-length vector containing the MCMC draws for the standard deviation of the treatment tree fits.  Equal to abs(sd_moderate * (bscale1-bscale0)).}
-
-\item{bscale1}{A nsim-length vector containing the MCMC draws for b1, the scale for the treatment trees where z=1.}
-
-\item{bscale0}{A nsim-length vector containing the MCMC draws for b0, the scale for the treatment trees where z=0.}
-
-\item{eta}{A nsim-length vector containing the MCMC draws for eta, the scale for the prognostic trees.}
-
-\item{gamma}{A nsim-length vector containing the MCMC draws for gamma, the prior sd for eta.}
+\item{tau_sd}{A nsim-length vector containing the MCMC draws for the standard deviation of the treatment tree fits.}
 
 \item{ecross_control}{The expected number of crossings for the prognostic tree fit.}
 
@@ -171,7 +161,7 @@ fit = tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   ecross_control_candidates = NULL, ecross_moderate_candidates = NULL,
                   ecross_tune_nburn=100, ecross_tune_nsim=1000,
                   pihat_in_trt=T,
-                  probit=FALSE, yobs=NULL, set_probit_scales=F, verbose=T, mh=F, save_inputs=T)
+                  probit=FALSE, yobs=NULL, verbose=T, mh=F, save_inputs=T)
 }}
 \author{
 Jennifer E. Starling

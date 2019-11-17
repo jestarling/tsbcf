@@ -74,7 +74,7 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
    }
 
    # If subgroups_pred provided and no fits, give warning.
-   if(!is.null(subgroups_pred) & ("tau_oos" %in% names(tsbcf_output))){
+   if(!is.null(subgroups_pred) & !("tau_oos" %in% names(tsbcf_output))){
       warning("subgroups_pred is being ignored; no out-of-sample predictions in fit.")
    }
 
@@ -162,7 +162,7 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
          colnames(ate_t_oos) = tgrid
 
          for(t in 1:length(tgrid)){
-            ate_t_oos[,t] = rowMeans(my_matrix_oos[,which(tsbcf_output$tgt==tgrid[t]),drop=F])
+            ate_t_oos[,t] = rowMeans(my_matrix_oos[,which(tsbcf_output$tpred==tgrid[t]),drop=F])
          }
 
          out$ate_t_post_oos = ate_t_oos
@@ -248,8 +248,8 @@ getCausalEstimands = function(tsbcf_output, probit=F, relrisk=F, indiv=F, subgro
          colnames(cate_t_oos) = do.call(paste0, expand.grid(grps,'-',tgrid))
 
          for(tg in 1:(ng*nt)){
-            temp = my_matrix_oos[,which(subgroups==groups_and_times[tg,1]
-                                    & tsbcf_output$tgt_oos==groups_and_times[tg,2]),drop=F]
+            temp = my_matrix_oos[,which(subgroups_pred==groups_and_times[tg,1]
+                                    & tsbcf_output$tpred==groups_and_times[tg,2]),drop=F]
             cate_t_oos[,tg] =  apply(temp,1,function(x) mean(x,na.rm=T))
          }
 

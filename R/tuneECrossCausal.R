@@ -1,5 +1,5 @@
-tuneEcrossCausal = function(ecross_control_candidates = c(1,2.5,5),
-                            ecross_moderate_candidates = c(1,2.5,5,7.5,10),
+tuneEcrossCausal = function(ecross_control_candidates = c(1,2,3),
+                            ecross_moderate_candidates = c(1,2,3),
                             y, pihat, z, tgt, x_control, x_moderate,
                             pihatpred=0, zpred=0, tpred=0, xpred_control=matrix(0,0,0), xpred_moderate=matrix(0,0,0),
                             nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
@@ -39,19 +39,19 @@ tuneEcrossCausal = function(ecross_control_candidates = c(1,2.5,5),
 
       # Fit tsbcf model for each ecross candidate.
       fit = tsbcf(y, pihat, z, tgt, x_control, x_moderate,
-             pihatpred=0, zpred=0, tpred=0,
+             pihatpred, zpred, tpred,
              xpred_control=matrix(0,0,0), xpred_moderate=matrix(0,0,0),
-             nburn=nburn, nsim=nsim, ntree_control=200, ntree_moderate=50,
-             lambda=NULL, sigq=.9, sighat=NULL, nu=3,
-             base_control=.95, power_control=2,
-             base_moderate=.25, power_moderate=3,
-             sd_control=2*sd(y), sd_moderate=sd(y),
-             treatment_init = rep(1,length(unique(tgt))),
-             use_muscale=T, use_tauscale=T,
+             nburn, nsim, ntree_control, ntree_moderate,
+             lambda, sigq, sighat, nu=nu,
+             base_control, power_control,
+             base_moderate, power_moderate,
+             sd_control, sd_moderate,
+             treatment_init,
+             use_muscale, use_tauscale,
              ecross_control=ecross_candidates$ecross_control[i],
              ecross_moderate=ecross_candidates$ecross_moderate[i],
-             pihat_in_trt=F,
-             probit=FALSE, yobs=NULL, verbose=F, mh=F, save_inputs=F)
+             pihat_in_trt,
+             probit=probit, yobs=yobs, verbose=F, mh=F, save_inputs=F)
 
          # Calculate in-sample WAIC.
          check = checkFit(y=y,

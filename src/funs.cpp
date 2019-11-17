@@ -16,12 +16,12 @@ using namespace Rcpp;
 //-------------------------------------------------------------
 // Squared Exponential Covariance Function for two time vectors (x,y).
 //-------------------------------------------------------------
-mat cov_se(vec t1, vec t2, double ls, double var)
+mat cov_se(vec t1, vec t2, double ls, double sd)
 {
    //-------------------------------------------------------------
-   // INPUTS:	   x,y   = two vectors from the same space.
-   //				ls    = b 		= length (of period)
-   //				var   = tau1.sq = variance of function
+   // INPUTS:	x,y = two vectors from the same space.
+   //				ls = lengthscale
+   //				sd = sd
    //-------------------------------------------------------------
    // OUTPUT:	The squared exponential covariance matrix.
    //-------------------------------------------------------------
@@ -32,7 +32,7 @@ mat cov_se(vec t1, vec t2, double ls, double var)
    for(int i = 0; i < n1; i++) {
       for(int j=0; j < n2; j++) {
          arg = (t1[i] - t2[j])/ls;
-         C(i,j) = var*exp(-0.5*arg*arg);
+         C(i,j) = sd*sd*exp(-0.5*arg*arg);
       }
    }
 
@@ -93,12 +93,12 @@ mat rmvnormArma(int n, vec mu, mat sigma) {
 //-------------------------------------------------------------------------------
 // log of the integrated likelihood for tsbart, for a given tree/leaf.
 //-------------------------------------------------------------------------------
-double lil_ts(vec nt, vec sy_vec, double sy2, double sigma, vec mu0, mat Prec0){
+double lil_ts(vec nt, vec sy_vec, double sy2, double sigma, vec mu0, mat Prec){
    // nt = vector of number of obs in each time point for the given tree/leaf. nt = [nl_{t=1}, ..., nl_{t=T}]
    // sy = vector of sums of y's at each time point.  sy = [ sum(y in t=1), ..., sum(y in t=T) ]
    // sigma = error sd, sqrt of sigma^2
    // mu0 = vector of prior means.
-   // Prec0 = prior precision matrix for means (from sq exp kernel)
+   // Prec = prior precision matrix for means (from sq exp kernel)
 
    // For computational efficiency, we leave out the -.5*(mu_0^T K mu_0) term, since
    // we let mu_0=0.  Add this term if mu0 != 0.
@@ -107,39 +107,39 @@ double lil_ts(vec nt, vec sy_vec, double sy2, double sigma, vec mu0, mat Prec0){
    double nl = sum(nt);          // Total number of yl in leaf.
 
    // Precache a few terms to make calculation faster.
-   vec b = sy_vec/sig2 + Prec0*mu0;
-   mat C = Prec0;
+   vec b = sy_vec/sig2 + Prec*mu0;
+   mat C = Prec;
    C.diag() = C.diag() + nt/sig2;
 
    // Calculate log-likelihood.  Note: mu0.t()*K*mu0 excluded as mu0=0.
-   double ll = -.5*nl*log(2*PI*sig2) + .5*log(det(Prec0)) - .5*log(det(C)) -
+   double ll = -.5*nl*log(2*PI*sig2) + .5*log(det(Prec)) - .5*log(det(C)) -
                 .5*as_scalar(sy2/sig2 - b.t()*C.i()*b);
 
    return(ll);
 }
 
 // For het variances.
-double lilhet_ts(double n0, double n, vec n_vec, vec sy_vec, double sy2, vec mu0, mat Prec0){
+double lilhet_ts(double n0, double n, vec n_vec, vec sy_vec, double sy2, vec mu0, mat Prec){
    // n0 = number of obs in given tree/leaf.
    // n = sum of log-precisions phi in given tree/leaf.
    // n_vec = vector of sum of phi's for het, at each time point, for given tree/leaf.
    // sy = vector of sums of y's * phi's at each time point.  sy = [ sum(phi*y in t=1), ..., sum(phi*y in t=T) ]
    // sy2 = scalar, sum of y*y*phi for all obs in given tree/leaf.
    // mu0 = vector of prior means.
-   // Prec0 = prior precision matrix for means (from sq exp kernel)
+   // Prec = prior precision matrix for means (from sq exp kernel)
 
    // For computational efficiency, we leave out the -.5*(mu_0^T K mu_0) term, since
    // we let mu_0=0.  Add this term if mu0 != 0.
 
    // Precache a few terms to make calculation faster.
-   mat C = Prec0; // K = Prec0
+   mat C = Prec;
    C.diag() += n_vec; // Add sums of precisions to diagonal.
-   vec b = sy_vec + Prec0 * mu0;
+   vec b = sy_vec + Prec * mu0;
 
    // Calculate log-likelihood.  Note: mu0.t()*K*mu0 excluded as cancels in ratios.
    double ll = - .5*n0*log(2*PI)
                + .5*n // This is the .5 * log(det(Lambda)) term, where Lambda=diag(w).
-               + .5*log(det(Prec0))
+               + .5*log(det(Prec))
                - .5*log(det(C))
                - as_scalar(.5*(sy2 - b.t()*C.i()*b));
 
@@ -489,7 +489,7 @@ void drmu(tree& t, xinfo& xi, dinfo& di, pinfo& pi, RNG& gen)
    for(tree::npv::size_type i=0;i!=bnv.size();i++) {
 
       // Draw new mu value from MVN.
-      post_pars = mvn_post_util(pi.sigma, pi.mu0, pi.Prec0, sv[i].n_vec, sv[i].sy_vec);
+      post_pars = mvn_post_util(pi.sigma, pi.mu0, pi.Prec, sv[i].n_vec, sv[i].sy_vec);
 
       Phi = Rcpp::as<arma::mat>(post_pars["Phi"]);
       m = Rcpp::as<arma::vec>(post_pars["m"]);
@@ -520,7 +520,7 @@ void drmuhet(tree& t, xinfo& xi, dinfo& di, double* phi, pinfo& pi, RNG& gen)
    for(tree::npv::size_type i=0;i!=bnv.size();i++) {
 
       // Draw new mu value from MVN.
-      post_pars = mvn_post_util_het(pi.mu0, pi.Prec0, sv[i].n0_vec, sv[i].n_vec, sv[i].sy_vec);
+      post_pars = mvn_post_util_het(pi.mu0, pi.Prec, sv[i].n0_vec, sv[i].n_vec, sv[i].sy_vec);
 
       Phi = Rcpp::as<arma::mat>(post_pars["Phi"]);
       m = Rcpp::as<arma::vec>(post_pars["m"]);
@@ -536,6 +536,41 @@ void drmuhet(tree& t, xinfo& xi, dinfo& di, double* phi, pinfo& pi, RNG& gen)
       }
    }
 }
+
+//--------------------------------------------------
+// draw all the bottom node mu's
+
+// For homog variances, drawing from leaf prior.
+void drmuprior(tree& t, xinfo& xi, dinfo& di, pinfo& pi, RNG& gen)
+{
+   tree::npv bnv;
+   std::vector<sinfo> sv(di.tlen);
+   allsuff_ts(t,xi,di,bnv,sv);
+
+   List post_pars;
+   mat Phi = pi.Prec; // Set precision matrix to prior precision for prior draws.
+   vec m = zeros(di.tlen); // Set mean vector to all zeros for prior draws.
+   vec mu_draw;
+
+   for(tree::npv::size_type i=0;i!=bnv.size();i++) {
+
+      // Draw new mu value from MVN.
+      post_pars = mvn_post_util(pi.sigma, pi.mu0, pi.Prec, sv[i].n_vec, sv[i].sy_vec);
+
+      //Phi = Rcpp::as<arma::mat>(post_pars["Phi"]);
+      //m = Rcpp::as<arma::vec>(post_pars["m"]);
+      mu_draw = rmvnorm_post(m, Phi);
+
+      // Assign botton node values to new mu draw.
+      bnv[i] -> setm(mu_draw);
+
+      // Check for NA result.
+      if(sum(bnv[i]->getm() == bnv[i]->getm()) == 0) {
+         Rcpp::stop("drmuprior failed");
+      }
+   }
+}
+
 
 //--------------------------------------------------
 // normal density N(x, mean, variance)

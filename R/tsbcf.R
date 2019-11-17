@@ -1,5 +1,4 @@
-# Fit tsBART.  Wrapper function for calling tsbartFit.cpp and tsbartProbit.cpp.
-
+# Fit tsbcf.  Wrapper function for calling tsbartFit.cpp and tsbartProbit.cpp.
 
 ### For argument validation.
 .ident <- function(...){
@@ -14,47 +13,14 @@
    return( all( out ) )
 }
 
-### Tau solver for estimating prior probit scales (sd_control, sd_moderate) from data if indicated.
-tau_calc = function(phat, rr){
-
-   mu = qnorm(phat)
-   f = function(x){rr-pnorm(mu+x)/pnorm(mu)}
-
-   # Error handling for viable combination of phat and rr.
-   mytry = try(uniroot(f, lower=-10, upper=10, extendInt = "yes"), silent=T)
-
-   # If valid combination, return calculated tau.  Else print warning and calculate
-   # tau for max rr possible given the input phat.
-   if(is(mytry, "try-error")){
-
-      # Print warning message.
-      print('Warning: baseline risk (phat) and relative risk (rr) input combination invalid. Calculating tau based on max possible rr given phat.')
-
-      # De-crement rr until it is possible to achieve rr with any tau, given phat.
-      # Output this tau.
-      err_flag = 1
-      while(err_flag==1){
-         rr = rr - .01
-         mytry = try(uniroot(f, lower=-10, upper=10, extendInt = "yes"), silent=T)
-
-         if(!is(mytry, "try-error")){
-            tau = uniroot(f, lower=-10, upper=10, extendInt = "yes")$root
-            err_flag = 0
-            print(paste0('Max possible relative risk given phat: ', rr))
-         }
-      }
-
-   } else{
-      tau = uniroot(f, lower=-10, upper=10, extendInt = "yes")$root
-   }
-
-   return(tau)
-}
-
 ### Main tsbcf wrapper function.
 tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
-                  pihatpred=NULL, zpred=NULL, tpred=NULL, xpred_control=NULL, xpred_moderate=NULL,
-                  nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
+                  pihatpred=NULL,
+                  zpred=NULL,
+                  tpred=NULL,
+                  xpred_control=NULL, xpred_moderate=NULL,
+                  nburn=100, nsim=1000,
+                  ntree_control=200, ntree_moderate=50,
                   lambda=NULL, sigq=.9, sighat=NULL, nu=3,
                   base_control=.95, power_control=2,
                   base_moderate=.25, power_moderate=3,
@@ -205,8 +171,8 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    # Scale/center response y. (For non-probit case.)
    ################################################################
    ybar = ifelse(probit==FALSE, mean(y), 0)
-   ysig = ifelse(probit==FALSE, sd(y), 1)
-   y_scale = (y - ybar) / ysig
+   sdy = ifelse(probit==FALSE, sd(y), 1)
+   y_scale = (y - ybar) / sdy
 
    ################################################################
    # Create model matrix and set up hyperparameters.
@@ -344,7 +310,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                      xpred_con = t(xxpred_control[perm_oos,]), xpred_mod = t(xxpred_moderate[perm_oos,]),
                      xinfo_list_con = cutpoints_control, xinfo_list_mod = cutpoints_moderate,
                      nburn = nburn, nsim = nsim, ntree_con = ntree_control, ntree_mod = ntree_moderate,
-                     lambda=lambda, sigq=sigq, sighat=sighat, nu=nu,
+                     lambda=lambda, sigq=sigq, sigma=sighat, nu=nu,
                      base_con=base_control, power_con=power_control,
                      base_mod=base_moderate, power_mod=power_moderate,
                      ecross_con=ecross_control, ecross_mod=ecross_moderate,
@@ -376,19 +342,15 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    ################################################################
 
    # In-sample
-   yhat = ybar + out$yhat[,order(perm)] * ysig
-   mu = ybar + out$mu[,order(perm)] * ysig
-   tau = out$tau[,order(perm)] * ysig
-   sig_rescaled = out$sigma * ysig
+   yhat = ybar + out$yhat[,order(perm)] * sdy
+   mu = ybar + out$mu[,order(perm)] * sdy
+   tau = out$tau[,order(perm)] * sdy
+   sig_rescaled = out$sigma * sdy
 
    # Out-of-sample
-   yhat_oos = ybar + out$yhat_oos[,order(perm_oos)] * ysig
-   mu_oos = ybar + out$mu_oos[,order(perm_oos)] * ysig
-   tau_oos = out$tau_oos[,order(perm_oos)] * ysig
-
-   # Set up mu_sd and tau_sd draws.
-   mu_sd = abs(sd_control * out$eta)
-   tau_sd = abs(sd_moderate * (out$bscale1-out$bscale0))
+   yhat_oos = ybar + out$yhat_oos[,order(perm_oos)] * sdy
+   mu_oos = ybar + out$mu_oos[,order(perm_oos)] * sdy
+   tau_oos = out$tau_oos[,order(perm_oos)] * sdy
 
    ################################################################
    # Adjust alpha's and add accept/reject indicator.
@@ -452,27 +414,27 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                  'mu_oos'=mu_oos,
                  'tau_oos'=tau_oos,
                  'sigma'=sig_rescaled,
-                 'mu_sd' = mu_sd,
-                 'tau_sd' = tau_sd,
-                 'bscale1'=out$bscale1,
-                 'bscale0' = out$bscale0,
-                 'eta' = out$eta,
-                 'gamma' = out$gamma_mu,
+                 'mu_sd' = out$mu_sd_post,
+                 'tau_sd' = out$tau_sd_post,
+                 #'mscale' = out$mscale,
+                 #'bscale1'=out$bscale1,
+                 #'bscale0' = out$bscale0,
+                 #'alpha_t'=out$alpha_t*sdy + ybar,
                  'ecross_control'=ecross_control,
                  'ecross_moderate'=ecross_moderate)
    } else{
-      out = list('yhat'=yhat,
-                 'tgt'=tgt,
+      out = list('tgt'=tgt,
+                 'yhat'=yhat,
                  'mu'=mu,
                  'tau'=tau,
                  'sigma'=sig_rescaled,
-                 'mu_sd' = mu_sd,
-                 'tau_sd' = tau_sd,
-                 'bscale1'=out$bscale1,
-                 'bscale0' = out$bscale0,
-                 'eta' = out$eta,
-                 'gamma' = out$gamma_mu,
+                 'mu_sd' = out$mu_sd_post,
+                 'tau_sd' = out$tau_sd_post,
+                 #'mscale' = out$mscale,
+                 #'bscale1'=out$bscale1,
+                 #'bscale0' = out$bscale0,
                  'ecross_control'=ecross_control,
+                 #'alpha_t'=out$alpha_t*sdy + ybar,
                  'ecross_moderate'=ecross_moderate)
    }
 

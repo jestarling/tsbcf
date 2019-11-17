@@ -55,53 +55,33 @@ public:
    pinfo() {pbd=1.0; pb=.5; alpha=.95; beta=.5;  sigma=1.0;}
 
    //----------------------------
-   // new properties for functional bart.
+   // New properties for tsbcf.
    //----------------------------
 
    arma::vec mu0;       // Vector of prior means; length tlen.
    double ls;           // length-scale parameter for the Squared Exponential kernel.
-   double var;          // variance parameter for the Squared Exponential kernel.
-   mat Sigma0;          // Prior cov matrix for mu_l ~iid N(mu0, Sigma0 = K^-1)
-   mat Prec0;           // Prior precision matrix for mu_l, ie inv(Sigma0).
+   double tau;          // scalar sd for the Squared Exponential kernel. (Does not matrix part of SE kernel.)
+   mat K;               // Carries unscaled part of SE kernel.
+   mat Prec;            // Precision matrix for mu_l ~iid N(mu0, inv(Prec))
+   mat Prec0;           // Prior precision matrix.
 
-   // For augmented model to induce C+(0,sig2) hyperprior on var.
-   // y = eta * f(x) + e, e ~ N(0,sig2)
-   // eta | gamma ~ N(0,gamma2)
-   double eta;
-   double gamma;
-
-   // //----------------------------
-   // // new properties for causal functional bart.
-   // //----------------------------
-   // double eta_m;
-   // double eta_a;
-   // double gamma_m;
-   // double gamma_a;
-   // double beta_trt;   // Holds separate beta to regularize the alpha(x,pix)*zi trees.
+   // Note: SE kernel = (tau^2/2) * exp(.5 (( t-t')/l)^2)
 
    //----------------------------
-   // Functional bart pinfo constructor
+   // tsbcf pinfo constructor
    //----------------------------
 
-   pinfo(size_t tlen) { pbd=1.0; pb=.5; alpha=.95; beta=0.5; sigma=1.0;
-   mu0 = zeros(tlen);
-   ls=1.0; var=.005;  // Default for var is 1/m where m = 200 by default
-   eta = 1.0; gamma = 1.0;
-   Sigma0 = eye(tlen,tlen);
-   Prec0 = eye(tlen,tlen);}
-
-   // //----------------------------
-   // // Causal functional bart pinfo constructor
-   // //----------------------------
-   //
-   // pinfo(size_t tlen, double beta_t) { pbd=1.0; pb=.5; alpha=.95; beta=2; sigma=1.0;
-   // beta_trt = beta_t;
-   // mu0 = zeros(tlen);
-   // ls=1.0; var=.005;  // Default for var is 1/m where m = 200 by default
-   // eta_m = 1.0; eta_a = 1.0;
-   // gamma_m = 1.0; gamma_a = 1.0;
-   // Sigma0 = eye(tlen,tlen);}
-
+   pinfo(size_t tlen) {
+      pbd=1.0;
+      pb=.5;
+      alpha=.95;
+      beta=0.5;
+      sigma=1.0;
+      mu0 = zeros(tlen);
+      ls=1.0;
+      tau=1.0;
+      Prec = eye(tlen,tlen);
+      }
 };
 
 //============================================================

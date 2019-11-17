@@ -114,9 +114,9 @@ double bd(tree& x, xinfo& xi, dinfo& di, pinfo& pi, RNG& gen)
       //if((sl.n>=5) && (sr.n>=5)) { //cludge?
       if((sl.n>=2) && (sr.n>=2)) { //cludge?
 
-         lill = lil_ts(sl.n_vec, sl.sy_vec, sl.sy2, pi.sigma, pi.mu0, pi.Prec0);                        // USED lil(...)
-         lilr = lil_ts(sr.n_vec, sr.sy_vec, sr.sy2, pi.sigma, pi.mu0, pi.Prec0);                        // USED lil(...)
-         lilt = lil_ts(sl.n_vec + sr.n_vec, sl.sy_vec + sr.sy_vec, sl.sy2 + sr.sy2, pi.sigma, pi.mu0, pi.Prec0);  // USED lil(...)
+         lill = lil_ts(sl.n_vec, sl.sy_vec, sl.sy2, pi.sigma, pi.mu0, pi.Prec);                        // USED lil(...)
+         lilr = lil_ts(sr.n_vec, sr.sy_vec, sr.sy2, pi.sigma, pi.mu0, pi.Prec);                        // USED lil(...)
+         lilt = lil_ts(sl.n_vec + sr.n_vec, sl.sy_vec + sr.sy_vec, sl.sy2 + sr.sy2, pi.sigma, pi.mu0, pi.Prec);  // USED lil(...)
 
          alpha1 = (PGnx*(1.0-PGly)*(1.0-PGry)*PDy*Pnogy)/((1.0-PGnx)*PBx*Pbotx);
          alpha2 = alpha1*exp(lill+lilr-lilt);
@@ -211,9 +211,9 @@ double bd(tree& x, xinfo& xi, dinfo& di, pinfo& pi, RNG& gen)
       //--------------------------------------------------
       //compute alpha
 
-      double lill = lil_ts(sl.n_vec, sl.sy_vec, sl.sy2, pi.sigma, pi.mu0, pi.Prec0);
-      double lilr = lil_ts(sr.n_vec, sr.sy_vec, sr.sy2, pi.sigma, pi.mu0, pi.Prec0);
-      double lilt = lil_ts(sl.n_vec + sr.n_vec, sl.sy_vec + sr.sy_vec, sl.sy2 + sr.sy2, pi.sigma, pi.mu0, pi.Prec0);
+      double lill = lil_ts(sl.n_vec, sl.sy_vec, sl.sy2, pi.sigma, pi.mu0, pi.Prec);
+      double lilr = lil_ts(sr.n_vec, sr.sy_vec, sr.sy2, pi.sigma, pi.mu0, pi.Prec);
+      double lilt = lil_ts(sl.n_vec + sr.n_vec, sl.sy_vec + sr.sy_vec, sl.sy2 + sr.sy2, pi.sigma, pi.mu0, pi.Prec);
 
       double alpha1 = ((1.0-PGny)*PBy*Pboty)/(PGny*(1.0-PGlx)*(1.0-PGrx)*PDx*Pnogx);
       double alpha2 = alpha1*exp(lilt - lill - lilr);
@@ -352,11 +352,11 @@ double bdhet(tree& x, xinfo& xi, dinfo& di, double* phi, pinfo& pi, RNG& gen)
       //if((sl.n>=5) && (sr.n>=5)) {
       if((abs(sl.n)>=2) && (abs(sr.n)>=2)) { //cludge?
 
-         lill = lilhet_ts(sl.n0, sl.n, sl.n_vec, sl.sy_vec, sl.sy2, pi.mu0, pi.Prec0);
-         lilr = lilhet_ts(sr.n0, sr.n, sr.n_vec, sr.sy_vec, sr.sy2, pi.mu0, pi.Prec0);
+         lill = lilhet_ts(sl.n0, sl.n, sl.n_vec, sl.sy_vec, sl.sy2, pi.mu0, pi.Prec);
+         lilr = lilhet_ts(sr.n0, sr.n, sr.n_vec, sr.sy_vec, sr.sy2, pi.mu0, pi.Prec);
          lilt = lilhet_ts(sl.n0+sr.n0, sl.n+sr.n, sl.n_vec+sr.n_vec,
                           sl.sy_vec+sr.sy_vec,
-                          sl.sy2+sr.sy2, pi.mu0, pi.Prec0);
+                          sl.sy2+sr.sy2, pi.mu0, pi.Prec);
 
          alpha1 = (PGnx*(1.0-PGly)*(1.0-PGry)*PDy*Pnogy)/((1.0-PGnx)*PBx*Pbotx);
          alpha2 = alpha1*exp(lill+lilr-lilt);
@@ -450,11 +450,11 @@ double bdhet(tree& x, xinfo& xi, dinfo& di, double* phi, pinfo& pi, RNG& gen)
       //--------------------------------------------------
       //compute alpha
 
-      double lill = lilhet_ts(sl.n0, sl.n, sl.n_vec, sl.sy_vec, sl.sy2, pi.mu0, pi.Prec0);
-      double lilr = lilhet_ts(sr.n0, sr.n, sr.n_vec, sr.sy_vec, sr.sy2, pi.mu0, pi.Prec0);
+      double lill = lilhet_ts(sl.n0, sl.n, sl.n_vec, sl.sy_vec, sl.sy2, pi.mu0, pi.Prec);
+      double lilr = lilhet_ts(sr.n0, sr.n, sr.n_vec, sr.sy_vec, sr.sy2, pi.mu0, pi.Prec);
       double lilt = lilhet_ts(sl.n0+sr.n0, sl.n+sr.n, sl.n_vec+sr.n_vec,
                               sl.sy_vec+sr.sy_vec,
-                              sl.sy2+sr.sy2, pi.mu0, pi.Prec0);
+                              sl.sy2+sr.sy2, pi.mu0, pi.Prec);
 
       double alpha1 = ((1.0-PGny)*PBy*Pboty)/(PGny*(1.0-PGlx)*(1.0-PGrx)*PDx*Pnogx);
       double alpha2 = alpha1*exp(lilt - lill - lilr);

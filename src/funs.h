@@ -40,7 +40,7 @@ void impute_x(int v, //variable index
 mat cov_se(vec t1,      // first vector of time points.
            vec t2,      // second vector of time points.
            double ls,   // length-scale parameter for SqExp
-           double var);  // variance parameter for SqExp
+           double sd);  // sd parameter for SqExp
 
 //--------------------------------------------------
 // MVN posterior utility function.
@@ -176,6 +176,7 @@ void partition(tree& t, xinfo& xi, dinfo& di, std::vector<size_t>& pv);
 
 void drmu(tree& t, xinfo& xi, dinfo& di, pinfo& pi, RNG& gen);
 void drmuhet(tree& t, xinfo& xi, dinfo& di, double* phi, pinfo& pi, RNG& gen);
+void drmuprior(tree& t, xinfo& xi, dinfo& di, pinfo& pi, RNG& gen);
 void drphi(tree& t, xinfo& xi, dinfo& di, pinfo& pi, RNG& gen);
 
 //--------------------------------------------------
