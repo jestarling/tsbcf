@@ -1,3 +1,4 @@
+#define ARMA_DONT_PRINT_ERRORS
 #include <RcppArmadillo.h>
 
 #include <cmath>
