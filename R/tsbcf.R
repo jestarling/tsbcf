@@ -67,6 +67,14 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
       tpred = tgt[1:min(3,length(tgt))]
       xpred_control = x_control[1:min(3,nrow(x_control)),,drop=F]
       xpred_moderate = x_moderate[1:min(3,nrow(x_moderate)),,drop=F]
+
+      # If some, but not all, prediction objects supplied - stop!
+      if(sum(is.null(pihatpred), is.null(zpred), is.null(tpred), is.null(xpred_control), is.null(xpred_moderate))<5){
+
+         stop('When supplying data for prediction, must input all of the following:\n',
+              'tpred, zpred, pihatpred, xpred_control, xpred_moderate.\n')
+
+      }
    }
 
    #---------------------------------------------------------------
@@ -89,7 +97,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
 
       stop("Data size mismatch. The following should all be equal:
            length(tpred): ", length(tpred), "\n",
-           "length(pihatpred): ", nrow(pihatpred), "\n",
+           "length(pihatpred): ", length(pihatpred), "\n",
            "nrow(xpred_control): ", nrow(xpred_control), "\n",
            "nrow(xpred_control): ", nrow(xpred_control), "\n")
    }
