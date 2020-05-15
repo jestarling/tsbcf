@@ -7,9 +7,9 @@ Author: Jennifer Starling
 Authors@R: person(given = "Jennifer", family = "Starling", email="jstarling@utexas.edu", role = c("aut", "cre"))
 Maintainer: Questions and comments to <jstarling@utexas.edu>
 BugReports: https://github.com/jestarling/tsbcf/issues
-Description: Implements Targeted Smooth Bayesian Causal Forests (tsbcf)
-License: GNU GPL v3.0
-Depends: Rcpp (>= 0.10.4), RcppArmadillo
+Description: Implements Targeted Smooth Bayesian Causal Forests (tsbcf).
+License: GPL-3
+Depends: Rcpp (>= 0.10.4), RcppArmadillo, R (>= 2.10)
 LinkingTo: Rcpp, RcppArmadillo
 NeedsCompilation: yes
 Suggests: knitr, rmarkdown
@@ -17,4 +17,4 @@ VignetteBuilder: knitr
 LazyData: true
 RoxygenNote: 6.1.1
 Encoding: UTF-8
-Remotes: jestarling/tsbart
+Remotes: 

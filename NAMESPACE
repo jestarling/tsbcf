@@ -1,2 +1,4 @@
 useDynLib(tsbcf)
 exportPattern("^[[:alpha:]]+")
+importFrom("stats", "filter", "lm", "loess", "pnorm", "qchisq",
+               "qnorm", "quantile", "sd", "sigma")

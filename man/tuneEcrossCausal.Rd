@@ -4,8 +4,8 @@
 \alias{tuneEcrossCausal}
 \title{tuneEcrossCausal: Utility function for tuning expected number of crossings for tsbcf().}
 \usage{
-tuneEcrossCausal(ecross_control_candidates = c(1,2.5,5),
-                 ecross_moderate_candidates = c(1,2.5,5,7.5,10),
+tuneEcrossCausal(ecross_control_candidates = c(1,2,3),
+                 ecross_moderate_candidates = c(1,2,3),
                  y, pihat, z, tgt, x_control, x_moderate,
                  pihatpred=0, zpred=0, tpred=0,
                  xpred_control=matrix(0,0,0), xpred_moderate=matrix(0,0,0),
