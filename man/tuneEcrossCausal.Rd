@@ -101,7 +101,7 @@ A list object, containing the following items:
 
 }
 \description{
-This function provides tunes the expected number of crossings.  See vignette for detail.
+This function provides tunes the expected number of crossings.
 }
 \examples{
 \dontrun{

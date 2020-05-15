@@ -180,9 +180,7 @@ fit.  Predicts function values at a set of new time points and covariates.
 }
 \examples{
 \dontrun{
-Function call example is as follows.
-
-# Fit model.
+# Function call example is as follows.
 fit = tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   pihatpred=NULL, zpred=NULL, tpred=NULL, xpred_control=NULL, xpred_moderate=NULL,
                   nburn=100, nsim=1000, ntree_control=200, ntree_moderate=50,
@@ -202,6 +200,6 @@ fit = tsbcf(y, pihat, z, tgt, x_control, x_moderate,
 \author{
 Jennifer E. Starling
 }
-\keyword{tsbcf,tsbart}
+\keyword{tsbcf}
 
 
