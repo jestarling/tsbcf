@@ -49,8 +49,28 @@ rpgmix <- function(n, a, m) {
     .Call('_tsbcf_rpgmix', PACKAGE = 'tsbcf', n, a, m)
 }
 
+drawleft <- function(tprime) {
+    .Call('_tsbcf_drawleft', PACKAGE = 'tsbcf', tprime)
+}
+
+drawright <- function(trunc) {
+    .Call('_tsbcf_drawright', PACKAGE = 'tsbcf', trunc)
+}
+
+rks1 <- function() {
+    .Call('_tsbcf_rks1', PACKAGE = 'tsbcf')
+}
+
+rks_cpp <- function(n) {
+    .Call('_tsbcf_rks_cpp', PACKAGE = 'tsbcf', n)
+}
+
 tsbcfFit <- function(y, z, zpred, tgt, tpred, x_con, x_mod, xpred_con, xpred_mod, xinfo_list_con, xinfo_list_mod, trt_init, nburn, nsim, ntree_con = 200L, ntree_mod = 50L, lambda = -999, sigq = .9, sigma = -999, nu = 3, base_con = .95, power_con = 2.0, base_mod = .25, power_mod = 3.0, ecross_con = 1, ecross_mod = 1, con_sd = 1, mod_sd = 1, use_muscale = FALSE, use_tauscale = FALSE, treef_name_ = "tsbcf_trees.txt", save_trees = FALSE, silent_mode = FALSE) {
     .Call('_tsbcf_tsbcfFit', PACKAGE = 'tsbcf', y, z, zpred, tgt, tpred, x_con, x_mod, xpred_con, xpred_mod, xinfo_list_con, xinfo_list_mod, trt_init, nburn, nsim, ntree_con, ntree_mod, lambda, sigq, sigma, nu, base_con, power_con, base_mod, power_mod, ecross_con, ecross_mod, con_sd, mod_sd, use_muscale, use_tauscale, treef_name_, save_trees, silent_mode)
+}
+
+tsbcfLogit <- function(y, yobs, z, zpred, tgt, tpred, x_con, x_mod, xpred_con, xpred_mod, xinfo_list_con, xinfo_list_mod, trt_init, nburn, nsim, ntree_con = 200L, ntree_mod = 50L, lambda = -999, sigq = .9, nu = 3, offset = 0, base_con = .95, power_con = 2.0, base_mod = .25, power_mod = 3.0, ecross_con = 1, ecross_mod = 1, con_sd = 1, mod_sd = 1, use_muscale = FALSE, use_tauscale = FALSE, treef_name_ = "tsbcf_trees.txt", save_trees = FALSE, silent_mode = FALSE) {
+    .Call('_tsbcf_tsbcfLogit', PACKAGE = 'tsbcf', y, yobs, z, zpred, tgt, tpred, x_con, x_mod, xpred_con, xpred_mod, xinfo_list_con, xinfo_list_mod, trt_init, nburn, nsim, ntree_con, ntree_mod, lambda, sigq, nu, offset, base_con, power_con, base_mod, power_mod, ecross_con, ecross_mod, con_sd, mod_sd, use_muscale, use_tauscale, treef_name_, save_trees, silent_mode)
 }
 
 tsbcfProbit <- function(y, yobs, z, zpred, tgt, tpred, x_con, x_mod, xpred_con, xpred_mod, xinfo_list_con, xinfo_list_mod, trt_init, nburn, nsim, ntree_con = 200L, ntree_mod = 50L, lambda = -999, sigq = .9, nu = 3, offset = 0, base_con = .95, power_con = 2.0, base_mod = .25, power_mod = 3.0, ecross_con = 1, ecross_mod = 1, con_sd = 1, mod_sd = 1, use_muscale = FALSE, use_tauscale = FALSE, treef_name_ = "tsbcf_trees.txt", save_trees = FALSE, silent_mode = FALSE) {

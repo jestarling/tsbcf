@@ -45,3 +45,5 @@ arma::vec rmvnorm_post(arma::vec &m, arma::mat &Phi) {
    arma::vec res = mu + arma::solve(arma::trimatu(arma::chol(Phi)), z);
    return(res);
 }
+
+

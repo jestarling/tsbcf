@@ -173,6 +173,49 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// drawleft
+double drawleft(double tprime);
+RcppExport SEXP _tsbcf_drawleft(SEXP tprimeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type tprime(tprimeSEXP);
+    rcpp_result_gen = Rcpp::wrap(drawleft(tprime));
+    return rcpp_result_gen;
+END_RCPP
+}
+// drawright
+double drawright(double trunc);
+RcppExport SEXP _tsbcf_drawright(SEXP truncSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type trunc(truncSEXP);
+    rcpp_result_gen = Rcpp::wrap(drawright(trunc));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rks1
+double rks1();
+RcppExport SEXP _tsbcf_rks1() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(rks1());
+    return rcpp_result_gen;
+END_RCPP
+}
+// rks_cpp
+Rcpp::NumericVector rks_cpp(int n);
+RcppExport SEXP _tsbcf_rks_cpp(SEXP nSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    rcpp_result_gen = Rcpp::wrap(rks_cpp(n));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tsbcfFit
 List tsbcfFit(arma::vec y, arma::vec z, arma::vec zpred, arma::vec tgt, arma::vec tpred, arma::vec x_con, arma::vec x_mod, arma::vec xpred_con, arma::vec xpred_mod, List xinfo_list_con, List xinfo_list_mod, arma::vec trt_init, int nburn, int nsim, int ntree_con, int ntree_mod, double lambda, double sigq, double sigma, double nu, double base_con, double power_con, double base_mod, double power_mod, double ecross_con, double ecross_mod, double con_sd, double mod_sd, bool use_muscale, bool use_tauscale, CharacterVector treef_name_, bool save_trees, bool silent_mode);
 RcppExport SEXP _tsbcf_tsbcfFit(SEXP ySEXP, SEXP zSEXP, SEXP zpredSEXP, SEXP tgtSEXP, SEXP tpredSEXP, SEXP x_conSEXP, SEXP x_modSEXP, SEXP xpred_conSEXP, SEXP xpred_modSEXP, SEXP xinfo_list_conSEXP, SEXP xinfo_list_modSEXP, SEXP trt_initSEXP, SEXP nburnSEXP, SEXP nsimSEXP, SEXP ntree_conSEXP, SEXP ntree_modSEXP, SEXP lambdaSEXP, SEXP sigqSEXP, SEXP sigmaSEXP, SEXP nuSEXP, SEXP base_conSEXP, SEXP power_conSEXP, SEXP base_modSEXP, SEXP power_modSEXP, SEXP ecross_conSEXP, SEXP ecross_modSEXP, SEXP con_sdSEXP, SEXP mod_sdSEXP, SEXP use_muscaleSEXP, SEXP use_tauscaleSEXP, SEXP treef_name_SEXP, SEXP save_treesSEXP, SEXP silent_modeSEXP) {
@@ -213,6 +256,50 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< bool >::type save_trees(save_treesSEXP);
     Rcpp::traits::input_parameter< bool >::type silent_mode(silent_modeSEXP);
     rcpp_result_gen = Rcpp::wrap(tsbcfFit(y, z, zpred, tgt, tpred, x_con, x_mod, xpred_con, xpred_mod, xinfo_list_con, xinfo_list_mod, trt_init, nburn, nsim, ntree_con, ntree_mod, lambda, sigq, sigma, nu, base_con, power_con, base_mod, power_mod, ecross_con, ecross_mod, con_sd, mod_sd, use_muscale, use_tauscale, treef_name_, save_trees, silent_mode));
+    return rcpp_result_gen;
+END_RCPP
+}
+// tsbcfLogit
+List tsbcfLogit(arma::vec y, arma::vec yobs, arma::vec z, arma::vec zpred, arma::vec tgt, arma::vec tpred, arma::vec x_con, arma::vec x_mod, arma::vec xpred_con, arma::vec xpred_mod, List xinfo_list_con, List xinfo_list_mod, arma::vec trt_init, int nburn, int nsim, int ntree_con, int ntree_mod, double lambda, double sigq, double nu, double offset, double base_con, double power_con, double base_mod, double power_mod, double ecross_con, double ecross_mod, double con_sd, double mod_sd, bool use_muscale, bool use_tauscale, CharacterVector treef_name_, bool save_trees, bool silent_mode);
+RcppExport SEXP _tsbcf_tsbcfLogit(SEXP ySEXP, SEXP yobsSEXP, SEXP zSEXP, SEXP zpredSEXP, SEXP tgtSEXP, SEXP tpredSEXP, SEXP x_conSEXP, SEXP x_modSEXP, SEXP xpred_conSEXP, SEXP xpred_modSEXP, SEXP xinfo_list_conSEXP, SEXP xinfo_list_modSEXP, SEXP trt_initSEXP, SEXP nburnSEXP, SEXP nsimSEXP, SEXP ntree_conSEXP, SEXP ntree_modSEXP, SEXP lambdaSEXP, SEXP sigqSEXP, SEXP nuSEXP, SEXP offsetSEXP, SEXP base_conSEXP, SEXP power_conSEXP, SEXP base_modSEXP, SEXP power_modSEXP, SEXP ecross_conSEXP, SEXP ecross_modSEXP, SEXP con_sdSEXP, SEXP mod_sdSEXP, SEXP use_muscaleSEXP, SEXP use_tauscaleSEXP, SEXP treef_name_SEXP, SEXP save_treesSEXP, SEXP silent_modeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type yobs(yobsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type z(zSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type zpred(zpredSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type tgt(tgtSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type tpred(tpredSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_con(x_conSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type x_mod(x_modSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type xpred_con(xpred_conSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type xpred_mod(xpred_modSEXP);
+    Rcpp::traits::input_parameter< List >::type xinfo_list_con(xinfo_list_conSEXP);
+    Rcpp::traits::input_parameter< List >::type xinfo_list_mod(xinfo_list_modSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type trt_init(trt_initSEXP);
+    Rcpp::traits::input_parameter< int >::type nburn(nburnSEXP);
+    Rcpp::traits::input_parameter< int >::type nsim(nsimSEXP);
+    Rcpp::traits::input_parameter< int >::type ntree_con(ntree_conSEXP);
+    Rcpp::traits::input_parameter< int >::type ntree_mod(ntree_modSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< double >::type sigq(sigqSEXP);
+    Rcpp::traits::input_parameter< double >::type nu(nuSEXP);
+    Rcpp::traits::input_parameter< double >::type offset(offsetSEXP);
+    Rcpp::traits::input_parameter< double >::type base_con(base_conSEXP);
+    Rcpp::traits::input_parameter< double >::type power_con(power_conSEXP);
+    Rcpp::traits::input_parameter< double >::type base_mod(base_modSEXP);
+    Rcpp::traits::input_parameter< double >::type power_mod(power_modSEXP);
+    Rcpp::traits::input_parameter< double >::type ecross_con(ecross_conSEXP);
+    Rcpp::traits::input_parameter< double >::type ecross_mod(ecross_modSEXP);
+    Rcpp::traits::input_parameter< double >::type con_sd(con_sdSEXP);
+    Rcpp::traits::input_parameter< double >::type mod_sd(mod_sdSEXP);
+    Rcpp::traits::input_parameter< bool >::type use_muscale(use_muscaleSEXP);
+    Rcpp::traits::input_parameter< bool >::type use_tauscale(use_tauscaleSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type treef_name_(treef_name_SEXP);
+    Rcpp::traits::input_parameter< bool >::type save_trees(save_treesSEXP);
+    Rcpp::traits::input_parameter< bool >::type silent_mode(silent_modeSEXP);
+    rcpp_result_gen = Rcpp::wrap(tsbcfLogit(y, yobs, z, zpred, tgt, tpred, x_con, x_mod, xpred_con, xpred_mod, xinfo_list_con, xinfo_list_mod, trt_init, nburn, nsim, ntree_con, ntree_mod, lambda, sigq, nu, offset, base_con, power_con, base_mod, power_mod, ecross_con, ecross_mod, con_sd, mod_sd, use_muscale, use_tauscale, treef_name_, save_trees, silent_mode));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -276,7 +363,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_tsbcf_dmixnorm_post", (DL_FUNC) &_tsbcf_dmixnorm_post, 4},
     {"_tsbcf_pmixnorm_post", (DL_FUNC) &_tsbcf_pmixnorm_post, 4},
     {"_tsbcf_rpgmix", (DL_FUNC) &_tsbcf_rpgmix, 3},
+    {"_tsbcf_drawleft", (DL_FUNC) &_tsbcf_drawleft, 1},
+    {"_tsbcf_drawright", (DL_FUNC) &_tsbcf_drawright, 1},
+    {"_tsbcf_rks1", (DL_FUNC) &_tsbcf_rks1, 0},
+    {"_tsbcf_rks_cpp", (DL_FUNC) &_tsbcf_rks_cpp, 1},
     {"_tsbcf_tsbcfFit", (DL_FUNC) &_tsbcf_tsbcfFit, 33},
+    {"_tsbcf_tsbcfLogit", (DL_FUNC) &_tsbcf_tsbcfLogit, 34},
     {"_tsbcf_tsbcfProbit", (DL_FUNC) &_tsbcf_tsbcfProbit, 34},
     {"_rcpp_module_boot_treesample_module", (DL_FUNC) &_rcpp_module_boot_treesample_module, 0},
     {NULL, NULL, 0}
