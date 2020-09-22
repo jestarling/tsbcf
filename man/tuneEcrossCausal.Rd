@@ -17,7 +17,7 @@ tuneEcrossCausal(ecross_control_candidates = c(1,2,3),
                  treatment_init = rep(1,length(unique(tgt))),
                  use_muscale=T, use_tauscale=T,
                  pihat_in_trt=F,
-                 probit=FALSE, yobs=NULL)
+                 link='identity', yobs=NULL)
 }
 \arguments{
 
@@ -83,7 +83,8 @@ tuneEcrossCausal(ecross_control_candidates = c(1,2,3),
 
 \item{pihat_in_trt}{Boolean, ndicates whether to include the estimated propensity score as a covariate for the treatment tree fit.  (Is always included in prognostic tree fit.)  Defaults to TRUE.}
 
-\item{probit}{0 indicates continuous response; 1 indicates probit response.  Default is 0.  If 1, then yobs must be populated.}
+\item{link}{Set to "identity" for Gaussian response, "probit", or "logit".  Default is "identity".  If not "identity",
+then yobs must be populated.}
 
 \item{yobs}{Length n vector of binary responses; only populated for probit=1 case.}
 
@@ -119,7 +120,7 @@ ecrossTune = tuneEcrossCausal(ecross_control_candidates = c(1,2.5,5),
                     treatment_init = rep(1,length(unique(tgt))),
                     use_muscale=T, use_tauscale=T,
                     pihat_in_trt=F,
-                    probit=FALSE, yobs=NULL)
+                    link='identity', yobs=NULL)
 
 ## View expected number of crossings.
 ecrossTune[["ecross_opt"]]

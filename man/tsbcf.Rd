@@ -16,7 +16,7 @@ tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   ecross_control_candidates = NULL, ecross_moderate_candidates = NULL,
                   ecross_tune_nsim=100, ecross_tune_nburn=1000,
                   pihat_in_trt=F,
-                  probit=FALSE, yobs=NULL, set_probit_scales=F,
+                  link='identity', yobs=NULL, set_scales=F,
                   verbose=T, mh=F, save_inputs=T)
 }
 \arguments{
@@ -109,12 +109,12 @@ Defaults to 1000.}
 \item{pihat_in_trt}{Boolean, ndicates whether to include the estimated propensity score as a
 covariate for the treatment tree fit.  (Is always included in prognostic tree fit.)  Defaults to TRUE.}
 
-\item{probit}{F indicates continuous response; T indicates probit response.  Default is F.  If T,
+\item{link}{Set to "identity" for Gaussian response, "probit", or "logit".  Default is "identity".  If not "identity",
 then yobs must be populated.}
 
 \item{yobs}{Length n vector of binary responses; only populated for probit=1 case.}
 
-\item{set_probit_scales}{Defaults to F.  When probit=T, if true, then sets control_sd and
+\item{set_scales}{Defaults to F.  When probit=T, if true, then sets control_sd and
 moderate_sd based on estimates of baseline and relative risk from data.}
 
 \item{verbose}{Boolean for writing progress report to console.}
@@ -194,7 +194,7 @@ fit = tsbcf(y, pihat, z, tgt, x_control, x_moderate,
                   ecross_control_candidates = NULL, ecross_moderate_candidates = NULL,
                   ecross_tune_nsim=100, ecross_tune_nburn=1000,
                   pihat_in_trt=T,
-                  probit=FALSE, yobs=NULL, set_probit_scales=F,
+                  link='identity', yobs=NULL, set_scales=F,
                   verbose=T, mh=F, save_inputs=T)
 }}
 \author{

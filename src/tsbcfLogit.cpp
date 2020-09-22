@@ -15,6 +15,7 @@
 
 using namespace Rcpp;
 using namespace arma;
+using namespace std;
 
 // [[Rcpp::export]]
 List tsbcfLogit(arma::vec y,       // True latent variable values of the response.
@@ -232,7 +233,7 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
    //------------------------------------------------------------------------
    // Prior for control trees.
    //------------------------------------------------------------------------
-   pinfo pi_con(tlen);
+   pinfo pi_con(tlen, n);
 
    pi_con.pbd = 1.0;          //prob of birth/death move
    pi_con.pb = .5;            //prob of birth given  birth/death
@@ -240,15 +241,15 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
    pi_con.beta = power_con;   //prior prob a bot node splits is alpha/(1+d)^beta, d is depth of node
 
    // Sigma.  Use user-provided sigma, unless null (-999); then use sd(y).  Gets adjusted later for backfitting: sig^2 / eta_con^2.
-   double sigma = 1;
-   pi_con.sigma = 1;
-   pi_con.sigma = sigma / fabs(mscale); //resid variance in backfitting is \sigma^2_y/mscale^2
+   // For logit formulation, we have latents z_i = f(t_i,z_i,z_i) + e_i, e_i ~ N(0, sigma_i).
+   arma::vec sigma = ones(n);
+   pi_con.sigma_het = sigma / fabs(mscale);  //resid variance in backfitting is \sigma^2_y/mscale^2
 
    // Use override for lambda if provided by user.  Else calculate using sigma and sigq.
    double qchi = 0;
    if(lambda==-999){
       qchi = R::qchisq(1-sigq, nu, true, false);
-      lambda = (sigma * sigma * qchi) / nu;
+      lambda = (1 * 1 * qchi) / nu; //(sigma * sigma * qchi) / nu;
    }
 
    // Initialize new tgt-related prior components.
@@ -272,7 +273,10 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
    pi_mod.pb = .5;                  // prob of birth given  birth/death
    pi_mod.alpha = base_mod;         // prior prob a bot node splits is alpha/(1+d)^beta, d is depth of node
    pi_mod.beta = power_mod;         // 3 for treatment trees.
-   pi_mod.sigma = pi_con.sigma;     // Same initial value as pi_con.sigma.  Gets adjusted later for backfitting: sig^2 / eta_mod^2.
+
+   // Sigma: Same initial value as pi_con.sigma.  Gets adjusted later for backfitting: sig^2 / eta_mod^2.
+   // For logit formulation, we have latents z_i = f(t_i,z_i,z_i) + e_i, e_i ~ N(0, sigma_i).
+   pi_mod.sigma_het = pi_con.sigma_het; //resid variance in backfitting is \sigma^2_y/mscale^2
 
    // Initialize new tgt-related prior components.
    pi_mod.mu0 = zeros(tlen);
@@ -368,8 +372,8 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
    //storage for full conditionals and associated quantities.
    //------------------------------------------------------------------------
 
-   // For sigma draw
-   NumericVector sigma_post(nsim);
+   // For sigma draw.  Since we have z_i = f(t_i, x_i, z_i) + e, e ~ N(0, sigma_i^2) need a matrix here now.
+   NumericMatrix sigma_post(nsim,n);
 
    // Standard deviations for mu and tau.
    NumericVector mu_sd_post(nsim);
@@ -423,6 +427,11 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
       //draw control trees
       //------------------------------------------------------------------------
 
+      // Set up temporary 'precisions' for heteroskedastic updates.
+      for(size_t k=0;k<n;k++){
+         precs[k] = (mscale*mscale)/(sigma[k]*sigma[k]);
+      }
+
       // Loop through ntree_con control trees.
       for(size_t j=0;j<ntree_con;j++) {
 
@@ -450,8 +459,8 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
          } // End loop over n observations for jth tree.
 
          // Birth-death proposal and drawing new leaf mu's.
-         alpha_con(i,j) = bd(t_con[j],xi_con,di_con,pi_con,gen);
-         drmu(t_con[j],xi_con,di_con,pi_con,gen);
+         alpha_con(i,j) = bdhet(t_con[j],xi_con,di_con,precs,pi_con,gen);
+         drmuhet(t_con[j],xi_con,di_con,precs,pi_con,gen);
 
          // Update the current tree, and add back the updated jth trees subtracted from each sum.
          fit(t_con[j],xi_con,di_con,ftemp);
@@ -470,10 +479,10 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
 
       // Set up temporary 'precisions' for heteroskedastic updates.
       for(size_t k=0;k<ntrt;k++){
-         precs[k] = (bscale1*bscale1)/(sigma*sigma);
+         precs[k] = (bscale1*bscale1)/(sigma[k]*sigma[k]);
       }
       for(size_t k=ntrt;k<n;k++){
-         precs[k] = (bscale0*bscale0)/(sigma*sigma);
+         precs[k] = (bscale0*bscale0)/(sigma[k]*sigma[k]);
       }
 
       // Loop through ntree_mod treatment trees.
@@ -530,10 +539,10 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
 
          double ww = 0.0;  // Tracks sum of w*w
          double rw = 0.0;  // Tracks sum of r*w
-         double s2 = sigma*sigma;
+         //double s2 = sigma*sigma;
 
          for(size_t k=0; k<n; ++k) {
-            double w = s2*mscale*mscale/(allfit_con[k]*allfit_con[k]);
+            double w = sigma[k]*sigma[k]*mscale*mscale/(allfit_con[k]*allfit_con[k]);
             if(w!=w) {
                Rcout << " w " << w << endl;
                stop("");
@@ -591,11 +600,11 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
          // Calculate sums required for means and variances.
          double ww0 = 0.0, ww1 = 0.0; // holds precisions.
          double rw0 = 0.0, rw1 = 0.0; // holds resids*precisions.
-         double s2 = sigma * sigma;
+         //double s2 = sigma * sigma;
 
          for(size_t k=0;k<n;k++){
             double bscale = (k<ntrt) ? bscale1 : bscale0;
-            double w = s2*bscale*bscale / (allfit_mod[k]*allfit_mod[k]);
+            double w = sigma[k]*sigma[k]*bscale*bscale / (allfit_mod[k]*allfit_mod[k]);
 
             if(w!=w){
                Rcout << "w: " << w << endl;
@@ -663,8 +672,6 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
          bscale0 = -.5;
       }
 
-      pi_mod.sigma = sigma;
-
       //------------------------------------------------------------------------
       // Sync yhat=allfit[k] after scale updates.
       //------------------------------------------------------------------------
@@ -675,20 +682,39 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
       }
 
       //------------------------------------------------------------------------
-      // Draw sigma.  No draws here since probit, but still have to update scale for backfitting.
+      // Update sigma_i.  Updated for logit draws.
       //------------------------------------------------------------------------
 
-      pi_con.sigma = sigma / fabs(mscale);
-      pi_mod.sigma = sigma;
+      // For residuals and squared residuals.
+      double resid = 0.0;
+
+      for(size_t k=0; k<n; ++k) {
+
+         // Calculate residuals.
+         resid = y[k]-allfit[k];
+         resid = resid * resid;
+
+         Rcpp::Rcout << "resid going into rks_posterior function: " << resid << endl;
+
+         // Draw updated sigma_i from posterior.
+         sigma[k] = rks_posterior(resid);
+
+         Rcpp::Rcout << "sigma_k draw: " << sigma[k] << endl;
+      }
+
+      // Updates for backfitting.
+      pi_con.sigma_het = sigma / fabs(mscale);
+      pi_mod.sigma_het = sigma;
 
       //------------------------------------------------------------------------
-      // Probit draw.
+      // Logit draw.
       //------------------------------------------------------------------------
       for(size_t k=0; k<n; ++k) {
+
          if(yobs[k]>0) {
-            y[k] = rtnormlo1(allfit[k], -offset); //offset isn't in allfit
+            y[k] = rtnormlo1(allfit[k], -offset)*sigma[k]; //offset isn't in allfit
          } else {
-            y[k] = rtnormhi1(allfit[k], -offset);
+            y[k] = rtnormhi1(allfit[k], -offset)*sigma[k];
          }
       }
 
@@ -713,7 +739,6 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
          for(size_t j=0;j<ntree_mod;j++) treef << t_mod[j] << endl;
 
          // Save traces of important parameters.
-         sigma_post(i-nburn) = 1.0;
          mscale_post(i-nburn) = mscale;
          bscale1_post(i-nburn) = bscale1;
          bscale0_post(i-nburn) = bscale0;
@@ -726,6 +751,8 @@ List tsbcfLogit(arma::vec y,       // True latent variable values of the respons
             double bscale = (k<ntrt) ? bscale1 : bscale0;
             mod_post(i-nburn,k) = (bscale1-bscale0) * allfit_mod[k]/bscale; // allfit_mod[k] = [b1*z_i + b0*(1-z_i)] * tau(x,t) == bscale * tau(x,t) --> need (b1 - b0) * tau(x,t), so divide out bscale.
             con_post(i-nburn,k) = yhat_post(i-nburn,k) - z[k]*mod_post(i-nburn,k);
+
+            sigma_post(i-nburn,k) = sigma[k];
          }
 
          // Draw out of sample treatment effects.

@@ -33,18 +33,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // checkFit
-List checkFit(arma::vec y, arma::mat mcmcdraws, bool probit, bool doWaic, Rcpp::Nullable<Rcpp::NumericVector> sig, Rcpp::Nullable<Rcpp::IntegerVector> yobs);
-RcppExport SEXP _tsbcf_checkFit(SEXP ySEXP, SEXP mcmcdrawsSEXP, SEXP probitSEXP, SEXP doWaicSEXP, SEXP sigSEXP, SEXP yobsSEXP) {
+List checkFit(arma::vec y, arma::mat mcmcdraws, bool binary_response, bool doWaic, Rcpp::Nullable<Rcpp::NumericVector> sig, Rcpp::Nullable<Rcpp::IntegerVector> yobs);
+RcppExport SEXP _tsbcf_checkFit(SEXP ySEXP, SEXP mcmcdrawsSEXP, SEXP binary_responseSEXP, SEXP doWaicSEXP, SEXP sigSEXP, SEXP yobsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::mat >::type mcmcdraws(mcmcdrawsSEXP);
-    Rcpp::traits::input_parameter< bool >::type probit(probitSEXP);
+    Rcpp::traits::input_parameter< bool >::type binary_response(binary_responseSEXP);
     Rcpp::traits::input_parameter< bool >::type doWaic(doWaicSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type sig(sigSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::IntegerVector> >::type yobs(yobsSEXP);
-    rcpp_result_gen = Rcpp::wrap(checkFit(y, mcmcdraws, probit, doWaic, sig, yobs));
+    rcpp_result_gen = Rcpp::wrap(checkFit(y, mcmcdraws, binary_response, doWaic, sig, yobs));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -205,14 +205,52 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rks_cpp
-Rcpp::NumericVector rks_cpp(int n);
-RcppExport SEXP _tsbcf_rks_cpp(SEXP nSEXP) {
+// rinvgauss_cpp
+Rcpp::NumericVector rinvgauss_cpp(size_t n, double mean, double shape, double dispersion);
+RcppExport SEXP _tsbcf_rinvgauss_cpp(SEXP nSEXP, SEXP meanSEXP, SEXP shapeSEXP, SEXP dispersionSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    rcpp_result_gen = Rcpp::wrap(rks_cpp(n));
+    Rcpp::traits::input_parameter< size_t >::type n(nSEXP);
+    Rcpp::traits::input_parameter< double >::type mean(meanSEXP);
+    Rcpp::traits::input_parameter< double >::type shape(shapeSEXP);
+    Rcpp::traits::input_parameter< double >::type dispersion(dispersionSEXP);
+    rcpp_result_gen = Rcpp::wrap(rinvgauss_cpp(n, mean, shape, dispersion));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rks_posterior
+double rks_posterior(double r2);
+RcppExport SEXP _tsbcf_rks_posterior(SEXP r2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type r2(r2SEXP);
+    rcpp_result_gen = Rcpp::wrap(rks_posterior(r2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rightmost_interval
+double rightmost_interval(double u, double lambda);
+RcppExport SEXP _tsbcf_rightmost_interval(SEXP uSEXP, SEXP lambdaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type u(uSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    rcpp_result_gen = Rcpp::wrap(rightmost_interval(u, lambda));
+    return rcpp_result_gen;
+END_RCPP
+}
+// leftmost_interval
+double leftmost_interval(double u, double lambda);
+RcppExport SEXP _tsbcf_leftmost_interval(SEXP uSEXP, SEXP lambdaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type u(uSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    rcpp_result_gen = Rcpp::wrap(leftmost_interval(u, lambda));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -366,7 +404,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_tsbcf_drawleft", (DL_FUNC) &_tsbcf_drawleft, 1},
     {"_tsbcf_drawright", (DL_FUNC) &_tsbcf_drawright, 1},
     {"_tsbcf_rks1", (DL_FUNC) &_tsbcf_rks1, 0},
-    {"_tsbcf_rks_cpp", (DL_FUNC) &_tsbcf_rks_cpp, 1},
+    {"_tsbcf_rinvgauss_cpp", (DL_FUNC) &_tsbcf_rinvgauss_cpp, 4},
+    {"_tsbcf_rks_posterior", (DL_FUNC) &_tsbcf_rks_posterior, 1},
+    {"_tsbcf_rightmost_interval", (DL_FUNC) &_tsbcf_rightmost_interval, 2},
+    {"_tsbcf_leftmost_interval", (DL_FUNC) &_tsbcf_leftmost_interval, 2},
     {"_tsbcf_tsbcfFit", (DL_FUNC) &_tsbcf_tsbcfFit, 33},
     {"_tsbcf_tsbcfLogit", (DL_FUNC) &_tsbcf_tsbcfLogit, 34},
     {"_tsbcf_tsbcfProbit", (DL_FUNC) &_tsbcf_tsbcfProbit, 34},

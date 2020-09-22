@@ -2,7 +2,6 @@
 #define GUARD_funs_h
 
 #include <RcppArmadillo.h>
-#include <cmath>
 #include <iostream>
 #include "tree.h"
 #include "info.h"

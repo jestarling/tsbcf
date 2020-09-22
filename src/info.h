@@ -48,6 +48,7 @@ public:
    double beta;
    //sigma
    double sigma;
+   arma::vec sigma_het; // For logit formulation, with heterogeneous sigma_i.
 
    //----------------------------
    // Original pinfo constructor; no time-series length argument.
@@ -82,6 +83,20 @@ public:
       tau=1.0;
       Prec = eye(tlen,tlen);
       }
+
+   // Constructor for logit - provides n, to initialize sigma_het vector.
+   pinfo(size_t tlen, size_t n) {
+      pbd=1.0;
+      pb=.5;
+      alpha=.95;
+      beta=0.5;
+      sigma_het=ones(n);
+      mu0 = zeros(tlen);
+      ls=1.0;
+      tau=1.0;
+      Prec = eye(tlen,tlen);
+   }
+
 };
 
 //============================================================

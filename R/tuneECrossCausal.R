@@ -10,7 +10,7 @@ tuneEcrossCausal = function(ecross_control_candidates = c(1,2,3),
                             treatment_init = rep(1,length(unique(tgt))),
                             use_muscale=T, use_tauscale=T,
                             pihat_in_trt=F,
-                            probit=FALSE, yobs=NULL){
+                            link='identity', yobs=NULL){
 
    #---------------------------------------------------
    # FUNCTION: Optimizes expected number of crossings across specified grid.
@@ -18,6 +18,11 @@ tuneEcrossCausal = function(ecross_control_candidates = c(1,2,3),
 
    require(tidyverse)
    require(ggthemes)
+
+   # Test that link argument is valid.
+   if(! link %in% c('identity','probit','logit')){
+      stop("Link argument must be 'identity', 'probit', or 'logit'.")
+   }
 
    # Test that candidate list is long enough.
    if(length(ecross_control_candidates)<3 & length(ecross_moderate_candidates)<3){
@@ -51,13 +56,13 @@ tuneEcrossCausal = function(ecross_control_candidates = c(1,2,3),
              ecross_control=ecross_candidates$ecross_control[i],
              ecross_moderate=ecross_candidates$ecross_moderate[i],
              pihat_in_trt,
-             probit=probit, yobs=yobs, verbose=F, mh=F, save_inputs=F)
+             link=link, yobs=yobs, verbose=F, mh=F, save_inputs=F)
 
          # Calculate in-sample WAIC.
          check = checkFit(y=y,
                           mcmcdraws = fit[["yhat"]],
                           sig = fit[["sigma"]],
-                          probit=probit,
+                          binary_response = ifelse(link=='identity',0,1),
                           doWaic=TRUE,
                           yobs=yobs)
 

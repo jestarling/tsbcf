@@ -18,7 +18,7 @@ using namespace arma;
 // [[Rcpp::export]]
 List checkFit(arma::vec y,
               arma::mat mcmcdraws,   // MCMC iterations in rows, observations in columns.
-              bool probit,
+              bool binary_response,
               bool doWaic,
               Rcpp::Nullable<Rcpp::NumericVector> sig = R_NilValue,
               Rcpp::Nullable<Rcpp::IntegerVector> yobs = R_NilValue){
@@ -26,11 +26,11 @@ List checkFit(arma::vec y,
    //*****************************************************************************
    // FUNCTION:   Calculates WAIC.
    //-----------------------------------------------------------------------------
-   // INPUTS:     y           = An n-length vector of y values.  (In probit case, the latents)
-   //             mcmcdraws   = A matrix of posterior draws (rows) for each obs (column). (In probit case, the latents)
-   //             probit      = A boolean; if TRUE, inputs are from probit functional BART.
+   // INPUTS:     y           = An n-length vector of y values.  (In binary_response case, the latents)
+   //             mcmcdraws   = A matrix of posterior draws (rows) for each obs (column). (In binary_response case, the latents)
+   //             binary_response      = A boolean; if TRUE, inputs are latents from probit or logit fit.
    //             doWaic      = A boolean; if TRUE, include WAIC calculation in output.
-   //             sig         = A vector of mcmc draws for sigma. (Null in probit case)
+   //             sig         = A vector of mcmc draws for sigma. (Null in probit/logit case)
    //             yobs        = Vector of 1/0 observed values; only populate for probit model.
    //-----------------------------------------------------------------------------
    // OUTPUT:     logdens_mcmc = Log-density (sum for all obs) for each mcmc iteration.
@@ -62,7 +62,7 @@ List checkFit(arma::vec y,
    //* Continuous response case.
    //*****************************************************************************
 
-   if(probit==FALSE){
+   if(binary_response==FALSE){
 
       // Convert yobs to arma vector.
       sigma = Rcpp::as<arma::vec>(sig);
@@ -93,9 +93,9 @@ List checkFit(arma::vec y,
    } // End continuous case.
 
    //*****************************************************************************
-   //* Probit case.
+   //* binary_response case.
    //*****************************************************************************
-   if(probit==TRUE){
+   if(binary_response==TRUE){
 
       // Convert yobs to arma vector.
       yobs_ = Rcpp::as<arma::vec>(yobs);
@@ -129,9 +129,9 @@ List checkFit(arma::vec y,
          lpd = as_scalar(sum(mean(ppd,1)));
          waic = -2 * (lpd - p_waic);
 
-      } // End probit waic.
+      } // End binary_response waic.
 
-   } // End probit case.
+   } // End binary_response case.
 
    //*****************************************************************************
    // Return list of function outputs.

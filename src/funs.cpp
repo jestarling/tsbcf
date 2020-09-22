@@ -1,7 +1,6 @@
 #define ARMA_DONT_PRINT_ERRORS
 #include <RcppArmadillo.h>
 
-#include <cmath>
 #include "funs.h"
 #include "rng.h"
 #include <map>

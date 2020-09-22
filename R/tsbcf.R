@@ -32,8 +32,15 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                   ecross_moderate_candidates = NULL,
                   ecross_tune_nsim=100, ecross_tune_nburn=1000,
                   pihat_in_trt=F,
-                  probit=FALSE, yobs=NULL, set_probit_scales=F,
+                  link='identity', yobs=NULL, set_scales=F,
                   verbose=T, mh=F, save_inputs=T){
+
+   ################################################################
+   # Load necessary libraries.
+   ################################################################
+   if(link=='logit'){
+      require(statmod)
+   }
 
    ################################################################
    # Capture key arguments.
@@ -44,11 +51,12 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    inputs = cbind.data.frame(
       'arg'=c('nburn','nsim','ntree_control','ntree_moderate','lambda','sigq','sighat','nu','base_control','power_control',
               'base_moderate','power_moderate','sd_control','sd_moderate','treatment_init','use_muscale','use_tauscale',
-              'ecross_control','ecross_moderate','pihat_in_trt','probit','verbose','mh'),
+              'ecross_control','ecross_moderate','pihat_in_trt','link','verbose','mh'),
       'value'=c(nburn,nsim,ntree_control,ntree_moderate,ifelse(is.null(lambda),"NULL",lambda),sigq,ifelse(is.null(sighat),"NULL",sighat),nu,base_control,power_control,
                 base_moderate,power_moderate,sd_control,sd_moderate, paste0(treatment_init,'',collapse=','), use_muscale,use_tauscale,
-                ecross_control,ecross_moderate,pihat_in_trt,probit,verbose,mh)
+                ecross_control,ecross_moderate,pihat_in_trt,link,verbose,mh)
    )
+
 
    ################################################################
    # Validate inputs.
@@ -108,9 +116,14 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    }
 
    #---------------------------------------------------------------
-   # Probit checks.
+   # Link input + Probit and logit checks.
    #---------------------------------------------------------------
-   if(probit==TRUE){
+
+   if(! link %in% c('identity','probit','logit')){
+     stop("Link argument must be 'identity', 'probit', or 'logit'.")
+   }
+
+   if(link %in% c('probit','logit')){
 
       # Data size match including yobs.
       if( !.ident(length(y), length(yobs), length(tgt), nrow(x_moderate), nrow(x_control))){
@@ -123,22 +136,22 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
       }
 
       #Yobs must be only 0/1.  Y must not be only 0/1.
-      if(length(unique(y))>2) warning("In probit case,
+      if(length(unique(y))>2) warning("In binary outcome case,
                                       y should contain initial latent variables,
                                       and yobs should contain observed binary values.")
 
-      if(length(unique(yobs))>2) stop("In probit case,
+      if(length(unique(yobs))>2) stop("In binary outcome case,
                                       y should contain initial latent variables,
                                       and yobs should contain observed binary values.")
-      if(is.null(yobs)) stop("yobs must be populated when probit=TRUE, and should contain observed binary values of 0/1.")
+      if(is.null(yobs)) stop("yobs must be populated when link!='identity', and should contain observed binary values of 0/1.")
 
-      # Warn user that manually input lambda and sighat values are ignored in probit case.
-      if(!is.null(lambda) || !is.null(sighat)) warning("lambda and sighat inputs are ignored in probit case, as prior
+      # Warn user that manually input lambda and sighat values are ignored in probit and logit cases.
+      if(!is.null(lambda) || !is.null(sighat)) warning("lambda and sighat inputs are ignored in probit and logit cases, as prior
                                                        tuning for sigma^2 is not applicable.")
    }
 
-   if(probit==FALSE){
-      if(!is.null(yobs)) stop("yobs is only for probit=TRUE case. Must be NULL when probit=FALSE.")
+   if(link=='identity'){
+      if(!is.null(yobs)) stop("yobs is only for link='probit' or link='logit' cases. Must be NULL when link='identity'.")
    }
 
    #---------------------------------------------------------------
@@ -153,8 +166,8 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    if(any(is.na(xpred_control))) stop("Missing values in xpred_control")
    if(any(is.na(xpred_moderate))) stop("Missing values in xpred_moderate")
 
-   if(length(unique(y))<5 && probit==FALSE) warning("y appears to be discrete")
-   # Ok for probit bc might be initializing 0/1 to two latent values.
+   if(length(unique(y))<5 && !(link %in% c('probit','logit'))) warning("y appears to be discrete")
+   # Ok for probit or logit bc might be initializing 0/1 to two latent values.
 
    if(any(pihat>1 || pihat<0)) stop("pihat must be in 0-1 range.")
    if(any(pihatpred>1 || pihatpred<0)) stop("pihatpred must be in 0-1 range.")
@@ -176,10 +189,10 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    if(ecross_moderate=="tune" & is.null(ecross_moderate_candidates)) warning("Default ecross_moderate_candidates will be used: {1, 2.5, 5, 7.5, 10}")
 
    ################################################################
-   # Scale/center response y. (For non-probit case.)
+   # Scale/center response y. (For non-binary case.)
    ################################################################
-   ybar = ifelse(probit==FALSE, mean(y), 0)
-   sdy = ifelse(probit==FALSE, sd(y), 1)
+   ybar = ifelse(link=='identity', mean(y), 0)
+   sdy = ifelse(link=='identity', sd(y), 1)
    y_scale = (y - ybar) / sdy
 
    ################################################################
@@ -218,11 +231,11 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    }
 
    ################################################################
-   # Set up probit parameters if probit=T.
+   # Set up probit/logit parameters if link != identity.
    ################################################################
    offset=0
 
-   if(probit==TRUE){
+   if(link != 'identity'){
       phat = mean(unlist(yobs))
       offset = qnorm(phat)
    }
@@ -231,7 +244,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    # Probit-scaled default control_sd and moderate_sd, based on
    # estimates of baseline risk and relative risk in data, if indicated.
    ################################################################
-   if(probit==TRUE & set_probit_scales==T){
+   if(link!='identity' & set_scales==T){
 
       phat = sum(yobs==1)/length(yobs)
       rrhat = (sum(yobs==1 & z==1) / sum(z==1)) /
@@ -240,7 +253,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
       sd_control = abs(qnorm(phat))
       sd_moderate = abs(tau_calc(phat, rrhat))
 
-      print(paste0('Setting probit scales:'))
+      print(paste0('Setting scales:'))
       print(paste0('sd_control: ', sd_control, ', sd_moderate: ', sd_moderate))
 
       # Update inputs.
@@ -288,7 +301,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                                lambda, sigq, sighat, nu,
                                base_control, power_control, base_moderate, power_moderate,
                                sd_control, sd_moderate, treatment_init,
-                               use_muscale, use_tauscale, pihat_in_trt, probit, yobs)
+                               use_muscale, use_tauscale, pihat_in_trt, link, yobs)
 
       ecross_control = as.numeric(tuned$ecross_control)
       ecross_moderate = as.numeric(tuned$ecross_moderate)
@@ -311,7 +324,7 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
    ################################################################
    out = NULL
 
-   if(probit==FALSE){
+   if(link=='identity'){
       out = tsbcfFit(y = y_scale[perm], z = z[perm], zpred = zpred[perm_oos], tgt = tgt[perm],
                      tpred = tpred[perm_oos],
                      x_con = t(xx_control[perm,]), x_mod = t(xx_moderate[perm,]),
@@ -326,9 +339,25 @@ tsbcf <- function(y, pihat, z, tgt, x_control, x_moderate,
                      trt_init = treatment_init,
                      use_muscale=use_muscale, use_tauscale=use_tauscale,
                      treef_name_="tsbtrees.txt", save_trees=FALSE, silent_mode=!verbose)
-   } else{
+   } else if(link=='probit'){
 
       out =  tsbcfProbit(y = y_scale[perm], yobs=yobs[perm], z = z[perm], zpred = zpred[perm_oos], tgt = tgt[perm],
+                         tpred = tpred[perm_oos],
+                         x_con = t(xx_control[perm,]), x_mod = t(xx_moderate[perm,]),
+                         xpred_con = t(xxpred_control[perm_oos,]), xpred_mod = t(xxpred_moderate[perm_oos,]),
+                         xinfo_list_con = cutpoints_control, xinfo_list_mod = cutpoints_moderate,
+                         nburn = nburn, nsim = nsim, ntree_con = ntree_control, ntree_mod = ntree_moderate,
+                         offset=offset,
+                         lambda=lambda, sigq=sigq, nu=nu,
+                         base_con=base_control, power_con=power_control,
+                         base_mod=base_moderate, power_mod=power_moderate,
+                         ecross_con=ecross_control, ecross_mod=ecross_moderate,
+                         con_sd=sd_control, mod_sd=sd_moderate,
+                         trt_init = treatment_init,
+                         use_muscale=use_muscale, use_tauscale=use_tauscale,
+                         treef_name_="tsbtrees.txt", save_trees=FALSE, silent_mode=!verbose)
+   } else{
+      out =  tsbcfLogit(y = y_scale[perm], yobs=yobs[perm], z = z[perm], zpred = zpred[perm_oos], tgt = tgt[perm],
                          tpred = tpred[perm_oos],
                          x_con = t(xx_control[perm,]), x_mod = t(xx_moderate[perm,]),
                          xpred_con = t(xxpred_control[perm_oos,]), xpred_mod = t(xxpred_moderate[perm_oos,]),

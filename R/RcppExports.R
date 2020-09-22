@@ -9,8 +9,8 @@ gig_norm <- function(lambda, chi, psi) {
     .Call('_tsbcf_gig_norm', PACKAGE = 'tsbcf', lambda, chi, psi)
 }
 
-checkFit <- function(y, mcmcdraws, probit, doWaic, sig = NULL, yobs = NULL) {
-    .Call('_tsbcf_checkFit', PACKAGE = 'tsbcf', y, mcmcdraws, probit, doWaic, sig, yobs)
+checkFit <- function(y, mcmcdraws, binary_response, doWaic, sig = NULL, yobs = NULL) {
+    .Call('_tsbcf_checkFit', PACKAGE = 'tsbcf', y, mcmcdraws, binary_response, doWaic, sig, yobs)
 }
 
 dmixnorm0 <- function(x, logprob, mu, sd) {
@@ -61,8 +61,20 @@ rks1 <- function() {
     .Call('_tsbcf_rks1', PACKAGE = 'tsbcf')
 }
 
-rks_cpp <- function(n) {
-    .Call('_tsbcf_rks_cpp', PACKAGE = 'tsbcf', n)
+rinvgauss_cpp <- function(n, mean, shape, dispersion) {
+    .Call('_tsbcf_rinvgauss_cpp', PACKAGE = 'tsbcf', n, mean, shape, dispersion)
+}
+
+rks_posterior <- function(r2) {
+    .Call('_tsbcf_rks_posterior', PACKAGE = 'tsbcf', r2)
+}
+
+rightmost_interval <- function(u, lambda) {
+    .Call('_tsbcf_rightmost_interval', PACKAGE = 'tsbcf', u, lambda)
+}
+
+leftmost_interval <- function(u, lambda) {
+    .Call('_tsbcf_leftmost_interval', PACKAGE = 'tsbcf', u, lambda)
 }
 
 tsbcfFit <- function(y, z, zpred, tgt, tpred, x_con, x_mod, xpred_con, xpred_mod, xinfo_list_con, xinfo_list_mod, trt_init, nburn, nsim, ntree_con = 200L, ntree_mod = 50L, lambda = -999, sigq = .9, sigma = -999, nu = 3, base_con = .95, power_con = 2.0, base_mod = .25, power_mod = 3.0, ecross_con = 1, ecross_mod = 1, con_sd = 1, mod_sd = 1, use_muscale = FALSE, use_tauscale = FALSE, treef_name_ = "tsbcf_trees.txt", save_trees = FALSE, silent_mode = FALSE) {
