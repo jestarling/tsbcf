@@ -257,11 +257,10 @@ List tsbcfProbit(arma::vec y,       // True latent variable values of the respon
    // Initialize GP-related prior components.
    pi_con.mu0 = zeros(tlen);
    pi_con.ls = tlen / (PI * ecross_con);
-
    pi_con.tau = con_sd / sqrt(delta_con) * sqrt((double) ntree_con);
-   pi_con.K = cov_se(tref, tref, pi_con.ls, 1).i();
-   pi_con.Prec = (1/(pi_con.tau*pi_con.tau)) * pi_con.K; // See info.h line 67.
+   pi_con.K = cov_se(tref, tref, pi_con.ls, 1.0).i();
 
+   pi_con.Prec = (1/(pi_con.tau*pi_con.tau)) * pi_con.K; // See info.h line 67.
    //------------------------------------------------------------------------
    // Prior for treatment trees.
    //------------------------------------------------------------------------

@@ -30,6 +30,7 @@ mat cov_se(vec t1, vec t2, double ls, double sd)
    int n1 = t1.size();
    int n2 = t2.size();
    mat C(n1,n2);
+
    for(int i = 0; i < n1; i++) {
       for(int j=0; j < n2; j++) {
          arg = (t1[i] - t2[j])/ls;
@@ -39,7 +40,6 @@ mat cov_se(vec t1, vec t2, double ls, double sd)
 
    // Add jitter to diagonal to ensure is pos semidef.
    C.diag() = C.diag() + .000001;
-
    return C;
 }
 

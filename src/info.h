@@ -81,6 +81,7 @@ public:
       ls=1.0;
       tau=1.0;
       Prec = eye(tlen,tlen);
+      K = eye(tlen,tlen);
       }
 };
 
